@@ -1,0 +1,78 @@
+% CVPR 2022 Paper Template
+% based on the CVPR template provided by Ming-Ming Cheng (https://github.com/MCG-NKU/CVPR_Template)
+% modified and extended by Stefan Roth (stefan.roth@NOSPAMtu-darmstadt.de)
+
+\documentclass[10pt,twocolumn,letterpaper]{article}
+
+%%%%%%%%% PAPER TYPE  - PLEASE UPDATE FOR FINAL VERSION
+% \usepackage[review]{cvpr}      % To produce the REVIEW version
+\usepackage{cvpr}              % To produce the CAMERA-READY version
+%\usepackage[pagenumbers]{cvpr} % To force page numbers, e.g. for an arXiv version
+
+% Include other packages here, before hyperref.
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{booktabs}
+
+
+% It is strongly recommended to use hyperref, especially for the review version.
+% hyperref with option pagebackref eases the reviewers' job.
+% Please disable hyperref *only* if you encounter grave issues, e.g. with the
+% file validation for the camera-ready version.
+%
+% If you comment hyperref and then uncomment it, you should delete
+% ReviewTempalte.aux before re-running LaTeX.
+% (Or just hit 'q' on the first LaTeX run, let it finish, and you
+%  should be clear).
+\usepackage[pagebackref,breaklinks,colorlinks]{hyperref}
+
+
+% Support for easy cross-referencing
+\usepackage[capitalize]{cleveref}
+\crefname{section}{Sec.}{Secs.}
+\Crefname{section}{Section}{Sections}
+\Crefname{table}{Table}{Tables}
+\crefname{table}{Tab.}{Tabs.}
+
+
+\begin{document}
+
+%%%%%%%%% TITLE 
+\title{Project proposal for Text Eraser on Image}
+
+\author{
+Members: Leung Tsz Kit Gary (tkleungal, 20863153);  % Fill in name here
+}
+\maketitle
+
+%%%%%%%%% CONTENT 
+\section{Background}
+
+In this project, we aim to develop a model solution to perform the task of text removal on images. 
+The idea was initiated from the problem that most of the text eraser solutions online currently are performed with English word processing, 
+with bad performance on processing of Chinese character mixed with English characters. 
+However, on the Hong Kong environment, such case is a common scenario. Therefore, we would like to develop a solution that can handle such use case.
+
+\section{Proposed Methodology}
+
+\subsection{Implementation}
+
+It is proposed that the machine learning solution will be splited into 2 parts:
+\begin{enumerate}
+    \item Image text segmentation
+    \item Inpainting
+\end{enumerate}
+
+For the flow of the solution, a network of image text segementation will first be computed with the input image.
+The output the segmentation will then be a mask of the text region.
+This mask can then be used for the inpainting model to remove the text region from the image.
+Resulting in the final output image with the text removed.
+
+\subsubsection{Image text segmentation}
+
+\subsubsection{Inpainting}
+
+\subsection{Evaluation}
+
+\end{document}
