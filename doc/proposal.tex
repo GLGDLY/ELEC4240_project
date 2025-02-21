@@ -43,6 +43,7 @@
 
 \author{
 Members: Leung Tsz Kit Gary (tkleungal, 20863153);  % Fill in name here
+Ip Marisa (mip, 21054353)
 }
 \maketitle
 
@@ -51,21 +52,21 @@ Members: Leung Tsz Kit Gary (tkleungal, 20863153);  % Fill in name here
 
 In this project, we aim to develop a model solution to perform the task of text removal on images. 
 The idea was initiated from the problem that most of the text eraser solutions online currently are performed with English word processing, 
-with bad performance on processing of Chinese character mixed with English characters. 
-However, on the Hong Kong environment, such case is a common scenario. Therefore, we would like to develop a solution that can handle such use case.
+with bad performance on processing of Chinese characters mixed with English characters. 
+However, in the Hong Kong environment, such case is a common scenario. Therefore, we would like to develop a solution that can handle such use case.
 
 \section{Proposed Methodology}
 
 \subsection{Implementation}
 
-It is proposed that the machine learning solution will be splited into 2 parts:
+It is proposed that the machine learning solution will be split into 2 parts:
 \begin{enumerate}
     \item Image text segmentation
     \item Inpainting
 \end{enumerate}
 
-For the flow of the solution, a network of image text segementation will first be computed with the input image.
-The output the segmentation will then be a mask of the text region.
+For the flow of the solution, a network of image text segmentation will first be computed with the input image.
+The output of the segmentation will then be a mask of the text region.
 This mask can then be used for the inpainting model to remove the text region from the image.
 Resulting in the final output image with the text removed.
 
