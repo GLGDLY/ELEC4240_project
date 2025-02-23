@@ -78,12 +78,22 @@ Resulting in the final output image with the text removed.
 % https://paperswithcode.com/dataset/rctw-17
 % https://paperswithcode.com/dataset/msda
 
-For the image text segmentation task, we propose using a U-Net adapted architecture, a fully convolutional neural network architecture developed for image segmentation, with further improvement to address mixed Chinese and English text detection, given its ability to capture both contextual information and fine details through skip connections. 
-The U-Net model will be trained to recognize and separate text regions from images with stronger feature extraction capacity by network depth adjustment and use of the attention mechanism. Improvements to the encoder and decoder path, for example, the use of ResNet blocks in order to learn text features in various scales and the strengthening of skip connections in order to preserve fine spatial details respectively, are also under consideration.
+For the image text segmentation task, we propose using an adapted U-Net architecture, a fully convolutional neural network architecture 
+developed for image segmentation, with further improvement to address mixed Chinese and English text detection, given its ability to capture 
+both contextual information and fine details through skip connections. 
+The U-Net model will be trained to recognize and separate text regions from images with stronger feature extraction capacity by network depth 
+adjustment and use of the attention mechanism. Improvements to the encoder and decoder path, for example, the use of ResNet blocks to 
+learn text features in various scales, and the strengthening of skip connections to preserve fine spatial details respectively, 
+are also under consideration.
 
-Regarding the training dataset selection, we plan to apply existing text recognition datasets in an attempt to achieve good performance across diverse text styles and languages. For instance, we will apply the MSDA (Multi-source Domain Adaptation) and RCTW-17 (Reading Chinese Text in the Wild) datasets to provide a range of images with multi-language text in diverse styles and complex backgrounds. 
-Besides, we will implement strong data augmentation techniques to better enable the model to generalize. This includes random rotations, scale variations, and contrast adjustments to simulate different text appearances. Furthermore, ground truth masks will be carefully annotated to define text regions precisely, with special attention to handling certain complex Chinese characters.
-By training on both real and simulated data, we aim to improve the ability of the model to accurately segment text in challenging images, thus producing a stable mask for the inpainting process to work with.
+Regarding the training dataset selection, we plan to apply existing text recognition datasets in an attempt to achieve good performance 
+across diverse text styles and languages. For instance, we will apply the MSDA (Multi-source Domain Adaptation) and RCTW-17 (Reading 
+Chinese Text in the Wild) datasets to provide a range of images with multi-language text in diverse styles and complex backgrounds. 
+Besides, we will implement strong data augmentation techniques to better enable the model to generalize. This includes random rotations, 
+scale variations, and contrast adjustments to simulate different text appearances. Furthermore, ground truth masks will be 
+carefully annotated to define text regions precisely, with special attention to handling certain complex Chinese characters.
+By training on both real and simulated data, we aim to improve the ability of the model to accurately segment text in challenging images, 
+thus producing a stable mask for the inpainting process to work with.
 
 \subsubsection{Inpainting}
 
