@@ -99,6 +99,21 @@ We believe that our model can learn the features of these images that contain no
 
 \subsection{Evaluation}
 
-% TensorBoard?
+TensorBoard will be used to monitor the model's training process, where the required metrics will be displayed as graphs and charts 
+for us to monitor the training process. The evaluation will be carried out separately for the segmentation model and the inpainting 
+model, correspondingly to the below metrics:
+
+For the segmentation model:
+\begin{enumerate}
+    \item $IoU$: Intersection of Union of the predicted mask and the ground truth mask, should be maximized
+    \item $F1\;score$: The harmonic mean of precision and recall, should be maximized
+\end{enumerate}
+
+For the inpainting model:
+\begin{enumerate}
+    \item $gen\_gan\_loss$: The loss of the generator in the GAN model, should be balanced with the $disc\_loss$
+    \item $disc\_loss$: The loss of the discriminator in the GAN model, should be balanced with the $gen\_gan\_loss$
+    \item $gen\_l1\_loss$: Mean absolute error between the generated image and the ground truth, should be minimized
+\end{enumerate}
 
 \end{document}
