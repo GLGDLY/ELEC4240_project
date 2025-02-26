@@ -52,7 +52,7 @@ Ip Marisa (mip, 21054353)
 
 In this project, we aim to develop a model solution to perform the task of text removal on images. 
 The idea was initiated from the problem that most of the text eraser solutions online currently are performed with English word processing, 
-with bad performance on processing of Chinese characters mixed with English characters. 
+with bad performance on the processing of Chinese characters mixed with English characters. 
 However, in the Hong Kong environment, such a case is a common scenario. Therefore, we would like to develop a solution that can handle such use case.
 
 \section{Proposed Methodology}
@@ -65,7 +65,7 @@ It is proposed that the machine learning solution will be split into 2 parts:
     \item Inpainting
 \end{enumerate}
 
-For the flow of the solution, a image text segmentation network will first be computed with the input image.
+For the flow of the solution, an image text segmentation network will first be computed with the input image.
 The output of the segmentation will then be a mask of the target text region which can then be used as one of the input of the 
 inpainting model to remove the text region from the image, resulting in the final output image with the text removed.
 
@@ -82,7 +82,7 @@ developed for image segmentation, with further improvement to address mixed Chin
 both contextual information and fine details through skip connections. 
 The U-Net model will be trained to recognize and separate text regions from images with stronger feature extraction capacity by network depth 
 adjustment and use of the attention mechanism. Improvements to the encoder and decoder path are also under consideration, 
-such as the use of ResNet blocks on encoders to learn text features in various scales, and the strengthening of skip connections to preserve fine spatial details respectively.
+such as using ResNet blocks on encoders to learn text features in various scales, and strengthening the skip connections to preserve fine spatial details respectively.
 
 Regarding the training dataset selection, we plan to apply existing text recognition datasets in an attempt to achieve good performance 
 across diverse text styles and languages. For instance, we will apply the MSDA and RCTW-17 datasets to provide a range of pre-annotated images 
