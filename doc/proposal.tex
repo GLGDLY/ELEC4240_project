@@ -65,10 +65,9 @@ It is proposed that the machine learning solution will be split into 2 parts:
     \item Inpainting
 \end{enumerate}
 
-For the flow of the solution, a network of image text segmentation will first be computed with the input image.
-The output of the segmentation will then be a mask of the text region.
-This mask can then be used for the inpainting model to remove the text region from the image.
-Resulting in the final output image with the text removed.
+For the flow of the solution, a image text segmentation network will first be computed with the input image.
+The output of the segmentation will then be a mask of the target text region which can then be used as one of the input of the 
+inpainting model to remove the text region from the image, resulting in the final output image with the text removed.
 
 \subsubsection{Image text segmentation}
 
@@ -103,7 +102,7 @@ details of the input image for the inpainting model. Also, the Partial Convoluti
 generate more realistic results, GAN-based architecture can also be considered to combine the inpainting model for better performance.
 Therefore, with the above requirements, we are currently investigating the possibility of using the pix2pix architecture,
 which is a conditional GAN model that can be used for image-to-image translation tasks with its generator as a modified U-Net, 
-with modifying its generator to use the Partial Convolution Layer for achieving the inpainting task.
+together with modifying its generator to use the Partial Convolution Layer for achieving the inpainting task.
 
 For the dataset used in training, first, we are planning to find some text detection-related online datasets, 
 such as the COCO-Text dataset, which filters out the images that contain no text for putting into our training dataset. 
