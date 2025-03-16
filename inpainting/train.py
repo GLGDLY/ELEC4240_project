@@ -27,14 +27,22 @@ class Trainer:
     def __init__(
         self,
         generator_type: GeneratorType,
-        model_suffix: str = datetime.now().strftime("%Y%m%d-%H%M%S"),
+        model_suffix: str = "",
         output_dir: str = "./models",
     ):
         self.generator = Generator(generator_type=generator_type)
         self.discriminator = Discriminator()
 
-        self.model_suffix = model_suffix
+        self.model_suffix = (
+            model_suffix + "_" + datetime.now().strftime("%Y%m%d-%H%M%S")
+        )
         self.output_dir = output_dir
+        self.generator_path = (
+            self.output_dir + f"/best_generator_{self.model_suffix}.h5"
+        )
+        self.discriminator_path = (
+            self.output_dir + f"/best_discriminator_{self.model_suffix}.h5"
+        )
 
         generator_scheduler = tf.keras.optimizers.schedules.ExponentialDecay(
             2e-4, decay_steps=100000, decay_rate=0.96, staircase=True
@@ -154,12 +162,8 @@ class Trainer:
 
         if gen_total_loss < best_gen_total_loss:
             best_gen_total_loss = gen_total_loss
-            self.generator.save(
-                self.output_dir + f"/best_generator_{self.model_suffix}.h5"
-            )
-            self.discriminator.save(
-                self.output_dir + f"/best_discriminator_{self.model_suffix}.h5"
-            )
+            self.generator.save(self.generator_path)
+            self.discriminator.save(self.discriminator_path)
 
         print(
             f"[Train] gen_total_loss: {t_gen_total_loss:.4f}, gen_gan_loss: {t_gen_gan_loss:.4f}, gen_l1_loss: {t_gen_l1_loss:.4f}, disc_loss: {t_disc_loss:.4f}"
@@ -194,7 +198,10 @@ class Trainer:
         print("Training finished.")
 
         # test
-        print("Testing...")
+        print("Testing on best model...")
+        self.generator.load_weights(self.generator_path)
+        self.discriminator.load_weights(self.discriminator_path)
+
         gen_total_loss, gen_gan_loss, gen_l1_loss, disc_loss = 0, 0, 0, 0
         for (masked_image, in_mask), target in tqdm(test_ds):
             _gen_total_loss, _gen_gan_loss, _gen_l1_loss, _disc_loss = self.__val(
@@ -231,5 +238,5 @@ if __name__ == "__main__":
         training=False
     )
 
-    trainer = Trainer(GeneratorType.PARTIAL_CONV, model_suffix="p_conv")
+    trainer = Trainer(GeneratorType.STANDARD_CONV, model_suffix="stand_conv")
     trainer.train(kfold_ds, test_ds, epochs=50)

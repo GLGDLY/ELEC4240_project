@@ -36,13 +36,15 @@ def p_downsample(
     return tf.keras.Model(inputs=[in_img, in_mask], outputs=[x, mask])
 
 
-def downsample(filters: int, size: int, apply_batchnorm: bool = True):
+def downsample(
+    in_channels: int, out_channels: int, size: int, apply_batchnorm: bool = True
+):
     initializer = tf.random_normal_initializer(0.0, 0.02)
 
     result = tf.keras.Sequential()
     result.add(
         tf.keras.layers.Conv2D(
-            filters,
+            out_channels,
             size,
             strides=2,
             padding="same",
@@ -98,14 +100,14 @@ def Generator(
 
     if generator_type == GeneratorType.STANDARD_CONV:
         down_stack = [
-            downsample(64, 4, apply_batchnorm=False),  # (batch_size, 128, 128, 64)
-            downsample(128, 4),  # (batch_size, 64, 64, 128)
-            downsample(256, 4),  # (batch_size, 32, 32, 256)
-            downsample(512, 4),  # (batch_size, 16, 16, 512)
-            downsample(512, 4),  # (batch_size, 8, 8, 512)
-            downsample(512, 4),  # (batch_size, 4, 4, 512)
-            downsample(512, 4),  # (batch_size, 2, 2, 512)
-            downsample(512, 4),  # (batch_size, 1, 1, 512)
+            downsample(3, 64, 4, apply_batchnorm=False),  # (batch_size, 128, 128, 64)
+            downsample(64, 128, 4),  # (batch_size, 64, 64, 128)
+            downsample(128, 256, 4),  # (batch_size, 32, 32, 256)
+            downsample(256, 512, 4),  # (batch_size, 16, 16, 512)
+            downsample(512, 512, 4),  # (batch_size, 8, 8, 512)
+            downsample(512, 512, 4),  # (batch_size, 4, 4, 512)
+            downsample(512, 512, 4),  # (batch_size, 2, 2, 512)
+            downsample(512, 512, 4),  # (batch_size, 1, 1, 512)
         ]
     elif generator_type == GeneratorType.PARTIAL_CONV:
         down_stack = [
@@ -151,7 +153,7 @@ def Generator(
     skips = []
     for down in down_stack:
         # print(down.get_config())
-        if len(down.get_config()["input_layers"]) == 2:
+        if len(down.get_config().get("input_layers", [])) == 2:  # TODO: any better way?
             x, mask = down([x, mask])  # partial conv
         else:
             x = down(x)  # standard conv
@@ -182,9 +184,9 @@ def Discriminator() -> tf.keras.Model:
 
     x = tf.keras.layers.concatenate([inp, tar])  # (batch_size, 256, 256, channels*2)
 
-    down1 = downsample(64, 4, False)(x)  # (batch_size, 128, 128, 64)
-    down2 = downsample(128, 4)(down1)  # (batch_size, 64, 64, 128)
-    down3 = downsample(256, 4)(down2)  # (batch_size, 32, 32, 256)
+    down1 = downsample(3, 64, 4, False)(x)  # (batch_size, 128, 128, 64)
+    down2 = downsample(64, 128, 4)(down1)  # (batch_size, 64, 64, 128)
+    down3 = downsample(128, 256, 4)(down2)  # (batch_size, 32, 32, 256)
 
     zero_pad1 = tf.keras.layers.ZeroPadding2D()(down3)  # (batch_size, 34, 34, 256)
     conv = tf.keras.layers.Conv2D(

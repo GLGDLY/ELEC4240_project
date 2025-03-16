@@ -28,17 +28,20 @@ class Inpainting:
 
 
 if __name__ == "__main__":
-    # find the latest model
+    # find the latest model of {model_suffix}
+    model_suffix = "stand_conv"
+
     model_dir = "./models"
     models = list(
         filter(
-            lambda x: x.endswith(".h5") and x.startswith("best_generator_"),
+            lambda x: x.endswith(".h5")
+            and x.startswith(f"best_generator_{model_suffix}"),
             os.listdir(model_dir),
         )
     )
-    gen_type = GeneratorType.PARTIAL_CONV
-    # if models:
-    if 0:
+    gen_type = GeneratorType.STANDARD_CONV
+    if models:
+        # if 0:
         models.sort()
         latest_model = models[-1]
         latest_model = os.path.join(model_dir, latest_model)
