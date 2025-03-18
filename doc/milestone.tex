@@ -1,0 +1,122 @@
+% CVPR 2022 Paper Template
+% based on the CVPR template provided by Ming-Ming Cheng (https://github.com/MCG-NKU/CVPR_Template)
+% modified and extended by Stefan Roth (stefan.roth@NOSPAMtu-darmstadt.de)
+
+\documentclass[10pt,twocolumn,letterpaper]{article}
+
+%%%%%%%%% PAPER TYPE  - PLEASE UPDATE FOR FINAL VERSION
+% \usepackage[review]{cvpr}      % To produce the REVIEW version
+\usepackage{cvpr}              % To produce the CAMERA-READY version
+%\usepackage[pagenumbers]{cvpr} % To force page numbers, e.g. for an arXiv version
+
+% Include other packages here, before hyperref.
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{booktabs}
+
+
+% It is strongly recommended to use hyperref, especially for the review version.
+% hyperref with option pagebackref eases the reviewers' job.
+% Please disable hyperref *only* if you encounter grave issues, e.g. with the
+% file validation for the camera-ready version.
+%
+% If you comment hyperref and then uncomment it, you should delete
+% ReviewTempalte.aux before re-running LaTeX.
+% (Or just hit 'q' on the first LaTeX run, let it finish, and you
+%  should be clear).
+\usepackage[pagebackref,breaklinks,colorlinks]{hyperref}
+
+
+% Support for easy cross-referencing
+\usepackage[capitalize]{cleveref}
+\crefname{section}{Sec.}{Secs.}
+\Crefname{section}{Section}{Sections}
+\Crefname{table}{Table}{Tables}
+\crefname{table}{Tab.}{Tabs.}
+
+
+%%%%%%%%% PAPER ID  - PLEASE UPDATE
+\def\cvprPaperID{*****} % *** Enter the CVPR Paper ID here
+\def\confName{CVPR}
+\def\confYear{2022}
+
+
+\begin{document}
+
+%%%%%%%%% TITLE - PLEASE UPDATE
+\title{Project Milestone for Text Eraser on Image}
+
+\author{
+Leung Tsz Kit Gary\\
+{\tt\small tkleungal@connect.ust.hk}
+% For a paper whose authors are all at the same institution,
+% omit the following lines up until the closing ``}''.
+% Additional authors and addresses can be added with ``\and'',
+% just like the second author.
+% To save space, use either the email address or home page, not both
+\and
+Ip Marisa\\
+{\tt\small mip@connect.ust.hk}
+}
+\maketitle
+
+%%%%%%%%% ABSTRACT
+% \begin{abstract}
+%    The ABSTRACT is to be in fully justified italicized text, at the top of the left-hand column, below the author and affiliation information.
+%    Use the word ``Abstract'' as the title, in 12-point Times, boldface type, centered relative to the column, initially capitalized.
+%    The abstract is to be in 10-point, single-spaced type.
+%    Leave two blank lines after the Abstract, then begin the main text.
+%    Look at previous CVPR abstracts to get a feel for style and length.
+% \end{abstract}
+
+%%%%%%%%% BODY TEXT
+\section{Introduction}
+\label{sec:intro}
+
+In this project, we aim to develop a model solution to perform the task of text removal on images. 
+The idea was initiated from the problem that most of the text eraser solutions online currently are performed with English word processing, 
+with bad performance on the processing of Chinese characters mixed with English characters. 
+However, in the Hong Kong environment, such a case is a common scenario. Therefore, we would like to develop a solution that can handle such use case.
+
+To approach the problem, a mixed deep learning solution will be proposed, with the following 2 parts:
+
+\begin{enumerate}
+  \item Image text segmentation
+  \item Inpainting
+\end{enumerate}
+
+For the flow of the solution, an image text segmentation network will first be computed with the input image.
+The output of the segmentation will then be a mask of the target text region which can then be used as one of the input of the 
+inpainting model to remove the text region from the image, resulting in the final output image with the text removed. The 
+project repository can be found with cloning this 
+\href{https://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@github.com/GLGDLY/ELEC4240_project}{Github link} 
+with the provided read-only fine-grained access token.
+
+\section{Problem statement}
+
+\subsection{Image text segmentation}
+
+\subsection{Inpainting}
+
+The second problem of this project is to develop an inpainting model that can erase the text region from the image, given the mask of the text region by 
+the image text segmentation model. The inpainting model will be trained with the input of the original image multiplied by the mask of the text region and 
+the mask of the text region itself, while the output will be the final image with the text region removed.
+
+With this objective, the COCO-Text dataset was selected, with filtering the images that contain no text into our training dataset. This dataset was 
+chosen since it contains text labels that can be used to easily filter out images that contain or do not contain text, and thus can be used to build our training 
+dataset that prevents our model to learn the wrong information like English text. With this approach, a total of 30,201 images were being selected, and with 
+performing train-test split with ratio of 0.8, the training dataset is having 24,160 images and the testing dataset is having 6,041 images currently. It is believed
+that this dataset size may not be enough for the training of the inpainting model, but it can be used as a starting point for the development of the model for testing
+the feasibility and performance for different model structures, and further data collection can be performed in the later stage of the project. The current dataset can
+be accessed with the following 
+\href{https://hkustconnect-my.sharepoint.com/:u:/g/personal/tkleungal_connect_ust_hk/EUJ-38d8cptNgW2RK0JzHI4BfIi5mXwbIEFObTG7ji9f8g?e=LqJ1Eu}{OneDrive link}.
+
+With the above dataset as the ground truth, the model input is generated by multiplying the original image with a input mask, where 2 different approaches has been 
+proposed and implemented. The first approach that we have tried is dynamically generating the mask of the ground truth image during the training process, with implementing
+the mask generation as the loading process of the dataset. The second approach that we have tried is to pre-generate the mask of the ground truth image and save it as a image
+file, then loading the image file to become a 1-channel mask when loading the ground truth image. With testing both methods with same model architecture and hyperparameters,
+it was found that the second approach is converging faster than the first approach
+
+
+\end{document}
