@@ -32,6 +32,20 @@ class InpaintingDataGenerator:
         image = normalize_img_tensor(image)
         return image
 
+    def _load_mask(self, image_path):
+        parts = tf.strings.split(image_path, "/")
+        if len(parts) == 1:
+            parts = tf.strings.split(image_path, "\\")
+        file = parts[-1]
+        folder = tf.strings.reduce_join(parts[:-1], separator="/")
+        mask_path = tf.strings.join([folder, "mask", file], separator="/")
+        mask = tf.io.read_file(mask_path)
+        mask = tf.image.decode_jpeg(mask, channels=1)
+        mask = tf.image.resize(mask, self.img_size)
+        mask = tf.image.convert_image_dtype(mask, tf.float32)
+        mask /= 255.0  # range [0, 1]
+        return 1.0 - mask
+
     def _random_augmentation(self, image):
         # Random flip
         image = tf.image.random_flip_left_right(image)
@@ -90,13 +104,13 @@ class InpaintingDataGenerator:
     def _train_process_path(self, image_path):
         image = self._load_and_preprocess(image_path)
         image = self._random_augmentation(image)
-        mask = self._generate_random_mask(image)
+        mask = self._load_mask(image_path)
         masked_image = self._apply_mask(image, mask)
         return (masked_image, mask), image
 
     def _val_process_path(self, image_path):
         image = self._load_and_preprocess(image_path)
-        mask = self._generate_random_mask(image)
+        mask = self._load_mask(image_path)
         masked_image = self._apply_mask(image, mask)
         return (masked_image, mask), image
 

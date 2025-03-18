@@ -19,7 +19,6 @@ from model import (
     generator_loss,
 )
 
-
 log_dir = "logs/"
 
 
@@ -48,7 +47,7 @@ class Trainer:
             2e-4, decay_steps=100000, decay_rate=0.96, staircase=True
         )
         discriminator_scheduler = tf.keras.optimizers.schedules.ExponentialDecay(
-            2e-4, decay_steps=100000, decay_rate=0.96, staircase=True
+            5e-5, decay_steps=100000, decay_rate=0.96, staircase=True
         )
         self.generator_optimizer = tf.keras.optimizers.Adam(
             generator_scheduler, beta_1=0.5
@@ -238,5 +237,5 @@ if __name__ == "__main__":
         training=False
     )
 
-    trainer = Trainer(GeneratorType.STANDARD_CONV, model_suffix="stand_conv")
+    trainer = Trainer(GeneratorType.STANDARD_CONV, model_suffix="stand_conv_fixmask")
     trainer.train(kfold_ds, test_ds, epochs=50)

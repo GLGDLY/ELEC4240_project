@@ -4,15 +4,23 @@ os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"
 
 import numpy as np
 import tensorflow as tf
-from PIL import Image
+
+# from IPython.display import display
+from matplotlib import pyplot as plt
 
 from data_loader import normalize_img_tensor
 from model import Generator, GeneratorType
 
 
-def display_tensor(tensor):
-    out_image = tf.squeeze(tensor).numpy() * 0.5 + 0.5
-    Image.fromarray((out_image * 255).astype(np.uint8)).show()
+def display_result(in_image, mask, out_image):
+    fig, ax = plt.subplots(1, 3, figsize=(15, 5))
+    ax[0].imshow(tf.squeeze(in_image).numpy() * 0.5 + 0.5)
+    ax[0].set_title("Input Image")
+    ax[1].imshow(tf.squeeze(mask).numpy(), cmap="gray")
+    ax[1].set_title("Mask")
+    ax[2].imshow(tf.squeeze(out_image).numpy() * 0.5 + 0.5)
+    ax[2].set_title("Output Image")
+    plt.show()
 
 
 class Inpainting:
@@ -27,9 +35,26 @@ class Inpainting:
         return self.generator([in_image, mask], training=False)
 
 
+def _load_mask(image_path):
+    parts = tf.strings.split(image_path, "/")
+    if len(parts) == 1:
+        parts = tf.strings.split(image_path, "\\")
+    file = parts[-1]
+    folder = tf.strings.reduce_join(parts[:-1], separator="/")
+    mask_path = tf.strings.join([folder, "mask", file], separator="/")
+    mask = tf.io.read_file(mask_path)
+    mask = tf.image.decode_jpeg(mask, channels=1)
+    mask = tf.image.resize(mask, (256, 256))
+    mask = tf.image.convert_image_dtype(mask, tf.float32)
+    mask /= 255.0
+
+    return 1.0 - mask
+
+
 if __name__ == "__main__":
     # find the latest model of {model_suffix}
-    model_suffix = "stand_conv"
+    model_suffix = "stand_conv_fixmask"
+    gen_type = GeneratorType.STANDARD_CONV
 
     model_dir = "./models"
     models = list(
@@ -39,7 +64,6 @@ if __name__ == "__main__":
             os.listdir(model_dir),
         )
     )
-    gen_type = GeneratorType.STANDARD_CONV
     if models:
         # if 0:
         models.sort()
@@ -84,11 +108,12 @@ if __name__ == "__main__":
     mask = tf.ones([mask_height, mask_width, 1], dtype=tf.float32)
     mask = tf.image.pad_to_bounding_box(mask, y, x, height, width)
     mask = 1.0 - mask
+
+    mask = _load_mask("./data/dataset/test/COCO_train2014_000000000030.jpg")
     mask = mask[None, :, :, :]
 
     in_image = in_image * mask + (1 - mask) * 1.0
 
-    display_tensor(in_image)
     print("in_shape:", in_image.shape)
     print("mask_shape:", mask.shape)
 
@@ -103,4 +128,4 @@ if __name__ == "__main__":
     # print("min:", tf.reduce_min(out_tensor).numpy())
 
     # show the result
-    display_tensor(out_tensor)
+    display_result(in_image, mask, out_tensor)
