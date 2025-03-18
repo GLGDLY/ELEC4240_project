@@ -58,7 +58,7 @@ class SegmentationDataGenerator:
         # Random brightness
         image = tf.image.random_brightness(image, 0.2)
 
-        return image, mask
+        return image
 
     def _applying_augmentation(self, image, mask, augmented_image):
         mask = tf.image.random_flip_left_right(mask)
