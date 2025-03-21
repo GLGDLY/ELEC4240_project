@@ -98,7 +98,7 @@ class InpaintingDataGenerator:
         return 1.0 - out_mask
 
     def _apply_mask(self, image, mask):
-        return image * mask + (1 - mask) * 1.0  # i.e. range [-1, 1]
+        return image * mask + (1 - mask)  # i.e. range [-1, 1]
         # return image * mask  # i.e. range [0, 1]
 
     def _train_process_path(self, image_path):

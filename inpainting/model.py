@@ -36,6 +36,36 @@ def p_downsample(
     return tf.keras.Model(inputs=[in_img, in_mask], outputs=[x, mask])
 
 
+def downsample_with_update_mask(
+    in_channels: int,
+    out_channels: int,
+    size: int,
+    apply_batchnorm: bool = True,
+    stride=2,
+):
+    initializer = tf.random_normal_initializer(0.0, 0.02)
+
+    in_img = tf.keras.layers.Input(shape=[None, None, in_channels])
+    in_mask = tf.keras.layers.Input(shape=[None, None, 1])
+
+    x, mask = StandardConv2DWithMaskUpdate(
+        filters=out_channels,
+        kernel_size=size,
+        strides=stride,
+        padding="same",
+        return_mask=True,
+        kernel_initializer=initializer,
+        use_bias=False,
+    )(in_img, in_mask)
+
+    if apply_batchnorm:
+        x = tf.keras.layers.BatchNormalization()(x)
+
+    x = tf.keras.layers.LeakyReLU()(x)
+
+    return tf.keras.Model(inputs=[in_img, in_mask], outputs=[x, mask])
+
+
 def downsample(
     in_channels: int, out_channels: int, size: int, apply_batchnorm: bool = True
 ):
@@ -121,8 +151,18 @@ def Generator(
             p_downsample(512, 512, 4),  # (batch_size, 1, 1, 512)
         ]
     elif generator_type == GeneratorType.MIXED_CONV:
+        # TODO: implement mixed conv
         down_stack = [
-            # TODO: implement mixed conv
+            downsample_with_update_mask(
+                3, 64, 4, apply_batchnorm=False
+            ),  # (batch_size, 128, 128, 64)
+            downsample_with_update_mask(64, 128, 4),  # (batch_size, 64, 64, 128)
+            p_downsample(128, 256, 4),  # (batch_size, 32, 32, 256)
+            p_downsample(256, 512, 4),  # (batch_size, 16, 16, 512)
+            p_downsample(512, 512, 4),  # (batch_size, 8, 8, 512)
+            p_downsample(512, 512, 4),  # (batch_size, 4, 4, 512)
+            p_downsample(512, 512, 4),  # (batch_size, 2, 2, 512)
+            p_downsample(512, 512, 4),  # (batch_size, 1, 1, 512)
         ]
     else:
         raise ValueError("Invalid generator_type")
@@ -147,7 +187,7 @@ def Generator(
         activation="tanh",
     )  # (batch_size, 256, 256, 3)
 
-    x, mask = in_img, 1.0 - in_mask  # i.e. partial conv need take reverse mask
+    x, mask = in_img, in_mask  # i.e. in_mask is already 0 for holes
 
     # Downsampling through the model
     skips = []
@@ -170,7 +210,6 @@ def Generator(
     x = last(x)
 
     # output image = x inpainting mask + original image on non-masked area
-    # output = x
     output = in_img * in_mask + x * (1 - in_mask)
 
     return tf.keras.Model(inputs=[in_img, in_mask], outputs=output)

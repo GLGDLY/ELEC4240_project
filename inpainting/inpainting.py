@@ -2,10 +2,8 @@ import os
 
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"
 
-import numpy as np
 import tensorflow as tf
 
-# from IPython.display import display
 from matplotlib import pyplot as plt
 
 from data_loader import normalize_img_tensor
@@ -53,8 +51,8 @@ def _load_mask(image_path):
 
 if __name__ == "__main__":
     # find the latest model of {model_suffix}
-    model_suffix = "stand_conv_fixmask"
-    gen_type = GeneratorType.STANDARD_CONV
+    model_suffix = "p_conv_fixmask_bugfix"
+    gen_type = GeneratorType.PARTIAL_CONV
 
     model_dir = "./models"
     models = list(
@@ -112,7 +110,7 @@ if __name__ == "__main__":
     mask = _load_mask("./data/dataset/test/COCO_train2014_000000000030.jpg")
     mask = mask[None, :, :, :]
 
-    in_image = in_image * mask + (1 - mask) * 1.0
+    in_image = in_image * mask + (1 - mask)
 
     print("in_shape:", in_image.shape)
     print("mask_shape:", mask.shape)
