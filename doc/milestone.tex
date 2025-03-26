@@ -148,21 +148,66 @@ where the mean absolute error was calculated only on the masked region of the ou
 With the above modifications to the pix2pix architecture, the model can now be correctly trainied and generating a output image with the masked region being inpainted. However, as the model now 
 consider the masked region also as valid input, but only handling the mask on the final output, with the fact that we are multiplying the original image with the mask to generate the input image, 
 the model need extra learning steps to learn to use the surrounding information of the masked region but not the masked region itself, leading to potentially slower convergence of the model. Also,
-as the model do not have the mask information, as well as the awareness of the masked region, the model might be treating every pure white region as the masked region, where it may put wrong 
-attention to the non-masked white region, or put incorrect attention to the padding region on the edge of the input image. As a result, there is a need to introduce a mask-awareness mechanism to
-the model, forcing the model to ignore the correct masked region and only use the non-masked region as valid features to generate the output. This was implemented by introducing the Nvidia's 
-Partial Convolution approach~\cite{Liu2018},
+as the model do not have the mask information, as well as the awareness of the masked region, it might be treating every pure white region as the masked region, putting wrong attention to the 
+non-masked white region, or putting incorrect attention to the padding region on the edge of the input image. As a result, there is a need to introduce a mask-awareness mechanism to the 
+model, forcing the model to ignore the correct masked region and only use the non-masked region as valid features to generate the output. This was implemented by introducing the Nvidia's 
+Partial Convolution approach~\cite{Liu2018}, which provides a rule-based special awareness mechanism to emphasize the convolution of the model learning on the non-masked region. The final 
+generator architecture was then implemented with 3 main possibilities, with fully using standard convolution layers, and with fully using partial convolution layers. The performance of these 2 
+different generator architectures will be evaluated in the later section of this report, while further investigation may be performed to evalute the combination of the 2 different convolution 
+layers in the generator architecture.
+
+For the discriminator, as currently we are mainly evaluating the generator with the using $LAMBDA = 100$, the effect of the discriminator is not yet significant and will be evaluated in the later
+stage of the project. Currently, the discriminator is the PatchGAN moddel from the pix2pix architecture with Binary Cross Entropy loss. 
 
 \section{Intermediate Results}
 
-% \cref{fig:stand_vs_pconv}
+\subsection{Image text segmentation}
 
-% \begin{figure}[t]
-%     \centering
-%     \includegraphics[width=\linewidth]{figures/milestone/stand_vs_pconv.png}
-%     \caption{}
-%     \label{fig:stand_vs_pconv}
-% \end{figure}
+\subsection{Inpainting}
+
+With the dataset structure and architecture mentioned above, tests were performed to evaluate the performance of different approaches, where same parameters and epochs were applied to these 
+approaches. As we are mainly evaluating the generator currently with the use of $LAMBDA = 100$ in the total generator loss calculation, where the discriminator is not yet significant and will be
+evaluated in the later stage of the project, we will mainly focus on the $gen\_l1\_loss$ for evalution in this stage. 
+
+First, considering the mask generation approach, both of the approaches were tested and the results were compared as shown in \cref{fig:gen_vs_fix}. It is obvious that the dynamically generated mask 
+approach is converging slower than the fixed mask approach. This is as expected, as the dynamically generated mask approach is generating the mask during the training process, leading to extra learning
+steps for the model to learn the mask information. Therefore, in the current stage, to increase the development and iteration speed of our model, the fixed mask approach would be selected for now.
+
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=\linewidth]{figures/milestone/gen_vs_fix.png}
+    \caption{Comparison of the training $gen\_l1\_loss$, with pink line as the dynamically generated mask approach, and purple line as the fixed mask approach.}
+    \label{fig:gen_vs_fix}
+\end{figure}
+
+Second, considering the generator architecture, the standard convolution approach and the partial convolution approach were tested and the results were compared as shown in \cref{fig:stand_vs_pconv}. It is 
+clear that the partial convolution has a much better convergence speed than the standard convolution approach, proving the idea of using the partial convolution layers to provide the mask-awareness towards 
+the generator. This can also be shown from the the outputs (\cref{fig:out_standconv} and \cref{fig:out_pconv}) of the 2 different approaches, where it can be seen that the standard convolution approach is 
+generating the masked region with an incoherent boundary, while the partial convolution approach has a better performance on reducing seams. The texture of the output image is also more realistic with the 
+partial convolution approach, in which we can see the standard convolution approach is generating point-like textures on the masked region as a result of invalid "0" values are also being learned by the model. 
+With such observation, the partial convolution approach would be perferrable for the further development of the model. Yet, further investigation may be needed to evaluate the performance on these approaches 
+on how well can they fool the discriminator, regarding the fact that our focus will start to shift to the discriminator in the later stage of the project.
+
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=\linewidth]{figures/milestone/stand_vs_pconv.png}
+    \caption{Comparison of the training $gen\_l1\_loss$, with purple line as the standard convolution approach, and green line as the partial convolution approach.}
+    \label{fig:stand_vs_pconv}
+\end{figure}
+
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=\linewidth]{figures/milestone/out_standconv.png}
+    \caption{Output image of the standard convolution approach.}
+    \label{fig:out_standconv}
+\end{figure}
+
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=\linewidth]{figures/milestone/out_pconv.png}
+    \caption{Output image of the partial convolution approach.}
+    \label{fig:out_pconv}
+\end{figure}
 
 %%%%%%%%% REFERENCES
 {\small
