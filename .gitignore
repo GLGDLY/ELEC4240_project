@@ -20,3 +20,4 @@ inpainting/data/*
 inpainting/venv/
 inpainting/logs/
 inpainting/models/
+inpainting/mask.jpg
