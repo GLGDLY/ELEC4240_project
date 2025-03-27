@@ -36,13 +36,13 @@ class SegmentationDataGenerator:
         if len(parts) == 1:
             parts = tf.strings.split(image_path, "\\")
         file = parts[-1]
-        folder = tf.strings.reduce_join(parts[:-1], separator="/")
-        
-        mask_path = tf.strings.join([folder, "segmentation", file], separator="/")
-        
+        folder = tf.strings.reduce_join(parts[:-2], separator="/")
+
+        mask_path = tf.strings.join([folder, "mask", file], separator="/")
+
         mask = tf.io.read_file(mask_path)
         mask = tf.image.decode_jpeg(mask, channels=1)
-        mask = tf.image.resize(mask, self.img_size, method='nearest')
+        mask = tf.image.resize(mask, self.img_size, method="nearest")
         mask = tf.image.convert_image_dtype(mask, tf.float32)
         return mask
 
@@ -60,34 +60,34 @@ class SegmentationDataGenerator:
 
         return image
 
-    def _applying_augmentation(self, image, mask, augmented_image):
-        mask = tf.image.random_flip_left_right(mask)
-        mask = tf.image.random_flip_up_down(mask)
-        
-        k = tf.random.uniform([], 0, 4, dtype=tf.int32)
-        mask = tf.image.rot90(mask, k)
-        
-        return augmented_image, mask
-        
-    def _train_process_path(self, image_path, mask_path):
+    # def _applying_augmentation(self, image, mask, augmented_image):
+    #     mask = tf.image.random_flip_left_right(mask)
+    #     mask = tf.image.random_flip_up_down(mask)
+
+    #     k = tf.random.uniform([], 0, 4, dtype=tf.int32)
+    #     mask = tf.image.rot90(mask, k)
+
+    #     return augmented_image, mask
+
+    def _train_process_path(self, image_path):
         image = self._load_and_preprocess(image_path)
         mask = self._load_segmentation_mask(image_path)
-        
-        augmented_image = self._random_augmentation(image)
-        
-        augmented_image, augmented_mask = self._applying_augmentation(
-            image, mask, augmented_image
-        )
 
-        return (augmented_image, augmented_mask), image
-    
-    def _val_process_path(self, image_path, mask_path):
+        augmented_image = self._random_augmentation(image)
+
+        # augmented_image, augmented_mask = self._applying_augmentation(
+        #     image, mask, augmented_image
+        # )
+
+        return (augmented_image, mask), image
+
+    def _val_process_path(self, image_path):
         image = self._load_and_preprocess(image_path)
         mask = self._load_segmentation_mask(image_path)
         return (image, mask), image
 
     def get_dataset(self, training=True):
-        dataset = tf.data.Dataset.from_tensor_slices((self.image_paths, self.mask_paths))
+        dataset = tf.data.Dataset.from_tensor_slices(self.image_paths)
 
         if training:
             dataset = dataset.shuffle(self.buffer_size)
@@ -104,7 +104,7 @@ class SegmentationDataGenerator:
         return dataset
 
 
-def prepare_kfold_data(image_dir, mask_dir, n_splits=5, batch_size=32, img_size=(256, 256)):
+def prepare_kfold_data(image_dir, n_splits=5, batch_size=32, img_size=(256, 256)):
     data_root = pathlib.Path(image_dir)
     image_paths = [str(p) for p in data_root.glob("*.jpg")]
     image_paths = np.array(image_paths)
@@ -118,16 +118,42 @@ def prepare_kfold_data(image_dir, mask_dir, n_splits=5, batch_size=32, img_size=
         val_paths = image_paths[val_idx]
 
         train_gen = SegmentationDataGenerator(
-            image_paths=train_paths, img_size=img_size, batch_size=batch_size
+            image_paths=train_paths,
+            img_size=img_size,
+            batch_size=batch_size,
         )
         train_ds = train_gen.get_dataset(training=True)
 
         val_gen = SegmentationDataGenerator(
-            image_paths=val_paths, img_size=img_size, batch_size=batch_size
+            image_paths=val_paths,
+            img_size=img_size,
+            batch_size=batch_size,
         )
-        
+
         val_ds = val_gen.get_dataset(training=False)
 
         fold_datasets.append((train_ds, val_ds))
 
     return fold_datasets
+
+
+def test_generator():
+    data_root = pathlib.Path("./data/train/images")
+    image_paths = [str(p) for p in data_root.glob("*.jpg")]
+    image_paths = np.array(image_paths)
+
+    gen = SegmentationDataGenerator(
+        image_paths=image_paths,
+        img_size=(256, 256),
+        batch_size=1,
+    )
+
+    dataset = gen.get_dataset(training=True)
+    print(dataset)
+
+    for (img, mask), _ in dataset.take(1):
+        print(img.shape, mask.shape)
+
+
+if __name__ == "__main__":
+    test_generator()
