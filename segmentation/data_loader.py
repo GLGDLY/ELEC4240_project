@@ -68,23 +68,23 @@ class SegmentationDataGenerator:
         mask = tf.image.rot90(mask, k)
         
         return augmented_image, mask
-
+        
     def _train_process_path(self, image_path, mask_path):
         image = self._load_and_preprocess(image_path)
         mask = self._load_segmentation_mask(image_path)
         
         augmented_image = self._random_augmentation(image)
         
-        augmented_image, augmented_mask = self._apply_same_augmentation(
+        augmented_image, augmented_mask = self._applying_augmentation(
             image, mask, augmented_image
         )
-        
-        return (augmented_image, augmented_mask), image
 
+        return (augmented_image, augmented_mask), image
+    
     def _val_process_path(self, image_path, mask_path):
-        image = self._load_and_preprocess_image(image_path)
-        mask = self._load_and_preprocess_mask(mask_path)
-        return image, mask
+        image = self._load_and_preprocess(image_path)
+        mask = self._load_segmentation_mask(image_path)
+        return (image, mask), image
 
     def get_dataset(self, training=True):
         dataset = tf.data.Dataset.from_tensor_slices((self.image_paths, self.mask_paths))
@@ -105,9 +105,8 @@ class SegmentationDataGenerator:
 
 
 def prepare_kfold_data(image_dir, mask_dir, n_splits=5, batch_size=32, img_size=(256, 256)):
-    # Get image and mask paths
-    image_root = pathlib.Path(image_dir)
-    image_paths = [str(p) for p in data_root.glob("*.jpg")]    
+    data_root = pathlib.Path(image_dir)
+    image_paths = [str(p) for p in data_root.glob("*.jpg")]
     image_paths = np.array(image_paths)
 
     kfold = KFold(n_splits=n_splits, shuffle=True, random_state=42)
