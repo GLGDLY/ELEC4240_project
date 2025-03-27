@@ -152,6 +152,31 @@ changing $LAMBDA$ value during the training process.
 \section{Technical Approach}
 
 \subsection{Image text segmentation}
+With respect to the above problem statement, an advanced architecture based on the U-Net model was proposed and developed. 
+The original U-Net architecture features an encoder-decoder structure, where the encoder progressively reduces the spatial dimensions of the input image while capturing rich feature representations, 
+and the decoder reconstructs the segmentation map by upsampling those features. In addition to the skip connections, 
+which is to preserve spatial information across different scales, making it particularly suitable for precise segmentation tasks. 
+Nonetheless, since the U-Net was originally designed for biomedical image segmentation, a number of modifications were needed to adapt 
+for the challenging nature of mixed-language text segmentation, where text features vary significantly in terms of style, size, and orientation. 
+
+To enhance its performance further, several modifications were implemented. First, the encoder pathway was enhanced by replacing the 
+standard convolutional blocks with ResNet blocks. This modification allows the model to learn more complex features by utilizing skip connections 
+within the ResNet architecture, which helps mitigate the vanishing gradient problem and enables deeper feature extraction. 
+Second, an attention mechanism was integrated into the skip connections between the encoder and decoder paths. 
+Unlike the original direct skip connections, the attention gates help the model focus on relevant text regions while suppressing background noise, 
+implemented as: $F_{att} = \sigma(W_x * x + W_g * g + b)$, where $x$ represents features from the encoder path and $g$ represents 
+the gated signal from the decoder path. Lastly, the decoder pathway was strengthened with additional convolutional layers to better 
+reconstruct fine text details. By increasing the depth of the decoder, we ensure that the model can more effectively recover the 
+complex structures of the text regions, which will result in a more precise segmentation output. 
+
+With these architectural modifications, the model demonstrates improved text segmentation capability. 
+However, challenges remain in handling text at extreme scales or with severe deformation. To address this, we implemented 
+a multi-scale training strategy where  the model learns scale-invariant characteristics by processing input photos at various resolutions. 
+Additionally, in order to enhance the model's ability to distinguish text from text-like patterns in complex backgrounds, 
+a dual-attention module is introduced for operating both spatially and channel-wise. The spatial attention helps locate text regions 
+while channel attention emphasizes feature channels most relevant to text characteristics. These mechanisms are computed as: $A_s = \sigma(Conv(Concat[AvgPool(F); MaxPool(F)]))$ for spatial attention and $A_c = \sigma(MLP(AvgPool(F)))$ for channel attention, 
+where F represents the input feature maps. The effectiveness of these different architectural components will be evaluated comprehensively 
+in the subsequent sections of this report, with potential exploration of hybrid approaches combining different attention mechanisms.
 
 \subsection{Inpainting}
 
