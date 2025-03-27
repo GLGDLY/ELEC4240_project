@@ -96,6 +96,26 @@ with the provided read-only fine-grained access token.
 \section{Problem statement}
 
 \subsection{Image text segmentation}
+To commence with, the first problem of this project is to develop an image text segmentation model capable of detecting and segmenting text regions from images. 
+The model is expected to produce a mask for the inpainting process to work with, where text regions are marked as 1 and non-text regions are marked as 0 in the binary mask output.
+
+To achieve this, the RCTW-17 dataset was used for providing pre-annotated images containing multi-language text in different styles and complex backgrounds.
+A total of 12,263 images were selected, with 8,034 and 4,229 images in the training and testing dataset respectively. 
+We will be working on another dataset shortly given the small dataset size RCTW are providing currently. The current dataset can be accessed with the following 
+\href{https://drive.google.com/drive/folders/1BbLe23KN1At6xsItvBcj9dXhPv6LdQH_?usp=sharing}{Google Drive link}.
+
+Making use with the above dataset, dynamic mask generation will be involved during the dataset loading process. 
+Pre-processed annotations given in the to generate binary masks, saving them as single-channel image files that are loaded alongside their corresponding input images during training. 
+It aims to provide accurate text region annotations, with their relative efficiency and impact on model performance to be analyzed in subsequent sections of this report. 
+These binary masks serve dual purposes: they act as ground truth labels for training the segmentation model, and later provide a standardized format for the inpainting stage of the text removal pipeline.
+
+It is expected that the model will be able to identify text regions across different languages, styles, and challenging image conditions. 
+The resulting binary masks will serve as crucial input for the subsequent inpainting process, ensuring reliable text removal from images. 
+The model's performance will be evaluated through multiple metrics tracked via TensorBoard:
+\begin{enumerate}
+    \item $IoU$: Intersection of Union of the predicted mask and the ground truth mask, should be maximized to ensure accurate localization
+    \item $F1\;score$: The harmonic mean of precision and recall, should be maximized to achieve balance for accuracy 
+\end{enumerate}
 
 \subsection{Inpainting}
 
