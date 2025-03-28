@@ -165,7 +165,7 @@ the vanilla convolutional blocks with ResNet blocks. With this modification, the
 by exploiting skip connections of the ResNet block architecture for alleviating the vanishing gradient issue and deep feature extraction. 
 Secondly, an attention mechanism was introduced in skip connections across decoder and encoder paths. Unlike the original direct skip connections, 
 the attention gates allow the model to focus on meaningful areas of text and disregard background noise, 
-achieved as: $F_{att} = \\sigma(W_x * x + W_g * g + b)$, where $x$ represents features from the encoder path and $g$ is the gated signal from the decoder path. 
+achieved as: $F_{att} = \sigma(W_x * x + W_g * g + b)$, where $x$ represents features from the encoder path and $g$ is the gated signal from the decoder path. 
 Lastly, the decoder path was reinforced further with additional convolutional layers to better restore fine text detail. 
 By increasing the depth of the decoder further, we are confident that the model can recover intricate text region structures better, 
 which will result in more accurate segmentation output.
@@ -175,7 +175,7 @@ in processing text with extreme size or extreme deformation. To avoid this, we u
 to learn scale-invariant features by feeding input images at various resolutions. In addition, to further enhance the capability of the model 
 to distinguish text from text-like patterns in complex backgrounds, a dual-attention mechanism is suggested for both spatial and channel-wise operations. 
 The spatial attention is used to locate the text areas, and channel attention is applied to the feature channels best fit for the nature of text. 
-These mechanisms are computed as: $A_s = \\sigma(Conv(Concat[AvgPool(F); MaxPool(F)]))$ for spatial attention and $A_c = \\sigma(MLP(AvgPool(F)))$ 
+These mechanisms are computed as: $A_s = \sigma(Conv(Concat[AvgPool(F); MaxPool(F)]))$ for spatial attention and $A_c = \\sigma(MLP(AvgPool(F)))$ 
 for channel attention, with F being the input feature maps. The efficiency of these different architectural blocks will be contrasted 
 in detail in the rest of this report, with future potential exploration of hybrid solutions combining different attention mechanisms.
 
