@@ -4,6 +4,7 @@ import datetime
 from model import UNet
 import matplotlib.pyplot as plt
 import numpy as np
+import glob
 from data_loader import SegmentationDataGenerator
 
 class TrainingPipeline:
@@ -158,3 +159,50 @@ class TrainingPipeline:
         plt.tight_layout()
         plt.savefig('predictions.png')
         plt.show()
+
+if __name__ == "__main__":
+    import pathlib
+    import tensorflow as tf
+    from sklearn.model_selection import train_test_split
+    
+    print("GPU Devices:", tf.config.list_physical_devices("GPU"))
+
+    processed_data_dir = "./processed_data"
+    
+    image_paths = sorted(glob.glob(os.path.join(processed_data_dir, "images/*.jpg")))
+    mask_paths = sorted(glob.glob(os.path.join(processed_data_dir, "masks/*_mask.jpg")))
+    
+    train_images, val_images, train_masks, val_masks = train_test_split(
+        image_paths, mask_paths, test_size=0.2, random_state=42
+    )
+    
+    train_generator = SegmentationDataGenerator(
+        image_paths=train_images,
+        mask_paths=train_masks,
+        batch_size=32
+    )
+    
+    val_generator = SegmentationDataGenerator(
+        image_paths=val_images,
+        mask_paths=val_masks,
+        batch_size=32
+    )
+    
+    pipeline = TrainingPipeline(
+        input_size=(256, 256, 3),
+        batch_size=32,
+        learning_rate=0.001
+    )
+    
+    train_dataset = train_generator.get_dataset(training=True)
+    val_dataset = val_generator.get_dataset(training=False)
+    
+    history = pipeline.train(
+        train_dataset=train_dataset,
+        val_dataset=val_dataset,
+        epochs=50
+    )
+    
+    pipeline.plot_training_history(history)
+    
+    pipeline.predict_and_visualize(val_dataset, num_samples=5)
