@@ -114,6 +114,7 @@ The model's performance will be evaluated through multiple metrics tracked via T
 \begin{enumerate}
     \item $IoU$: Intersection of Union of the predicted mask and the ground truth mask, should be maximized to ensure accurate localization
     \item $F1\;score$: The harmonic mean of precision and recall, should be maximized to achieve balance for accuracy 
+    \item $Dice Loss$: To measure the overlap between predicted segmentation and ground truth masks, should be minimized for a better match
 \end{enumerate}
 
 \subsection{Inpainting}
@@ -155,26 +156,26 @@ changing $LAMBDA$ value during the training process.
 In accordance with the aforementioned problem statement, an improved architecture was proposed and designed on the basis of the U-Net model. 
 The original U-Net architecture is of encoder-decoder form with the encoder slowly reducing the spatial dimensions of the input image with 
 deeper feature representation being learned and the decoder generating the segmentation map by upsampling the said features. 
-Aside from the skip connections, in order to preserve spatial information across scales, to be particularly well-suited to be employed 
-in precise segmentation tasks. Nevertheless, since the U-Net was originally designed for biomedical image segmentation, 
+In addition with the skip connections, which is to preserve spatial information across different scales,  can make the model to be suitably
+employed in precise segmentation tasks. Nevertheless, since the U-Net was originally designed for biomedical image segmentation, 
 some modifications are needed in order to fit the challenging nature of mixed-language text segmentation where text features 
 vary extensively in terms of style, size, and orientation.
 
-To enhance its performance even more, various modifications are proposed to be applied. Firstly, the encoder pathway was enhanced through replacing 
+To enhance its performance even more, various modifications are proposed to be applied. Firstly, the encoder pathway will be enhanced through replacing 
 the vanilla convolutional blocks with ResNet blocks. With this modification, the model has the capability of learning abstract-level features 
 by exploiting skip connections of the ResNet block architecture for alleviating the vanishing gradient issue and deep feature extraction. 
-Secondly, an attention mechanism was introduced in skip connections across decoder and encoder paths. Unlike the original direct skip connections, 
+Secondly, an attention mechanism will be introduced in skip connections across decoder and encoder paths. Unlike the original direct skip connections, 
 the attention gates allow the model to focus on meaningful areas of text and disregard background noise, 
 achieved as: $F_{att} = \sigma(W_x * x + W_g * g + b)$, where $x$ represents features from the encoder path and $g$ is the gated signal from the decoder path. 
-Lastly, the decoder path was reinforced further with additional convolutional layers to better restore fine text detail. 
+Lastly, the decoder path will be reinforced further with additional convolutional layers to better restore fine text detail. 
 By increasing the depth of the decoder further, we are confident that the model can recover intricate text region structures better, 
 which will result in more accurate segmentation output.
 
 With these architectural changes, the model shows improved text segmentation capability. However, there still exists a problem 
-in processing text with extreme size or extreme deformation. To avoid this, we used a multi-scale training strategy where the model is trained 
+in processing text with extreme size or extreme deformation. To avoid this, we are using a multi-scale training strategy where the model is trained 
 to learn scale-invariant features by feeding input images at various resolutions. In addition, to further enhance the capability of the model 
 to distinguish text from text-like patterns in complex backgrounds, a dual-attention mechanism is suggested for both spatial and channel-wise operations. 
-The spatial attention is used to locate the text areas, and channel attention is applied to the feature channels best fit for the nature of text. 
+The purpose of the spatial attention is to locate the text areas, and channel attention is applied to the feature channels best fit for the nature of text. 
 These mechanisms are computed as: $A_s = \sigma(Conv(Concat[AvgPool(F); MaxPool(F)]))$ for spatial attention and $A_c = \sigma(MLP(AvgPool(F)))$ 
 for channel attention, with F being the input feature maps. The efficiency of these different architectural blocks will be contrasted 
 in detail in the rest of this report, with future potential exploration of hybrid solutions combining different attention mechanisms.
