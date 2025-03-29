@@ -100,7 +100,7 @@ The model is expected to produce a mask for the inpainting process to work with,
 
 To achieve this, the RCTW-17 dataset was used for providing pre-annotated images containing multi-language text in different styles and complex backgrounds.
 A total of 12,263 images were selected, with 8,034 and 4,229 images in the training and testing dataset respectively. 
-We will be working on another dataset shortly given the small dataset size RCTW are providing currently. The current dataset can be accessed with the following 
+We will be working on another dataset shortly given the small dataset size RCTW is providing currently. The current dataset can be accessed with the following 
 \href{https://drive.google.com/drive/folders/1BbLe23KN1At6xsItvBcj9dXhPv6LdQH_?usp=sharing}{Google Drive link}.
 
 Making use with the above dataset, the bounding box annotations of the text regions provided were being processed and converted into binary mask images.
@@ -156,8 +156,8 @@ changing $LAMBDA$ value during the training process.
 In accordance with the aforementioned problem statement, an improved architecture was proposed and designed on the basis of the U-Net model. 
 The original U-Net architecture is of encoder-decoder form with the encoder slowly reducing the spatial dimensions of the input image with 
 deeper feature representation being learned and the decoder generating the segmentation map by upsampling the said features. 
-In addition with the skip connections, which is to preserve spatial information across different scales,  can make the model to be suitably
-employed in precise segmentation tasks. Nevertheless, since the U-Net was originally designed for biomedical image segmentation, 
+In addition with the skip connections, which is to preserve spatial information across different scales, can make the model to be suitable
+for precise segmentation tasks. Nevertheless, since the U-Net was originally designed for biomedical image segmentation, 
 some modifications are needed in order to fit the challenging nature of mixed-language text segmentation where text features 
 vary extensively in terms of style, size, and orientation.
 
@@ -175,7 +175,7 @@ With these architectural changes, the model shows improved text segmentation cap
 in processing text with extreme size or extreme deformation. To avoid this, we are using a multi-scale training strategy where the model is trained 
 to learn scale-invariant features by feeding input images at various resolutions. In addition, to further enhance the capability of the model 
 to distinguish text from text-like patterns in complex backgrounds, a dual-attention mechanism is suggested for both spatial and channel-wise operations. 
-The purpose of the spatial attention is to locate the text areas, and channel attention is applied to the feature channels best fit for the nature of text. 
+The purpose of the spatial attention is to locate the text areas, and channel attention is applied to the feature channels best fit for the nature of the text. 
 These mechanisms are computed as: $A_s = \sigma(Conv(Concat[AvgPool(F); MaxPool(F)]))$ for spatial attention and $A_c = \sigma(MLP(AvgPool(F)))$ 
 for channel attention, with F being the input feature maps. The efficiency of these different architectural blocks will be contrasted 
 in detail in the rest of this report, with future potential exploration of hybrid solutions combining different attention mechanisms.
@@ -192,7 +192,7 @@ the output of the generator by multiplying the output with the mask together wit
 also needed to be modified for only consider the masked region of the output. This was implemented by the following: $l1\_loss = reduce\_mean(\mid(target - gen\_output) \times (1 - mask)\mid)$, 
 where the mean absolute error was calculated only on the masked region of the output image.
 
-With the above modifications to the pix2pix architecture, the model can now be correctly trained and generating an output image with the masked region being inpainted. However, as the model now 
+With the above modifications to the pix2pix architecture, the model can now be correctly trained and generate an output image with the masked region being inpainted. However, as the model now 
 consider the masked region also as valid input, but only handling the mask on the final output, with the fact that we are multiplying the original image with the mask to generate the input image, 
 the model need extra learning steps to learn to use the surrounding information of the masked region but not the masked region itself, leading to potentially slower convergence of the model. Also,
 as the model do not have the mask information, as well as the awareness of the masked region, it might be treating every pure white region as the masked region, putting wrong attention to the 
@@ -265,7 +265,7 @@ mentioned in the previous sections.
 
 With the dataset structure and architecture mentioned above, tests were performed to evaluate the performance of different approaches, where same parameters and epochs were applied to these 
 approaches. As we are mainly evaluating the generator currently with the use of $LAMBDA = 100$ in the total generator loss calculation, where the discriminator is not yet significant and will be
-evaluated in the later stage of the project, we will mainly focus on the $gen\_l1\_loss$ for evalution in this stage. 
+evaluated in the later stage of the project, we will mainly focus on the $gen\_l1\_loss$ for evaluation in this stage. 
 
 First, considering the mask generation approach, both of the approaches were tested and the results were compared as shown in \cref{fig:gen_vs_fix}. It is obvious that the dynamically generated mask 
 approach is converging slower than the fixed mask approach. This is as expected, as the dynamically generated mask approach is generating the mask during the training process, leading to extra learning
@@ -283,7 +283,7 @@ clear that the partial convolution has a much better convergence speed than the 
 the generator. This can also be shown from the outputs (\cref{fig:out_standconv} and \cref{fig:out_pconv}) of the 2 different approaches, where it can be seen that the standard convolution approach is 
 generating the masked region with an incoherent boundary, while the partial convolution approach has a better performance on reducing seams. The texture of the output image is also more realistic with the 
 partial convolution approach, in which we can see the standard convolution approach is generating point-like textures on the masked region as a result of invalid "0" values are also being learned by the model. 
-With such observation, the partial convolution approach would be preferrable for the further development of the model. Yet, further investigation may be needed to evaluate the performance on these approaches 
+With such observation, the partial convolution approach would be preferable for the further development of the model. Yet, further investigation may be needed to evaluate the performance on these approaches 
 on how well can they fool the discriminator, regarding the fact that our focus will start to shift to the discriminator in the later stage of the project.
 
 \begin{figure}[t]
