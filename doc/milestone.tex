@@ -89,9 +89,8 @@ To approach the problem, a mixed deep learning solution will be proposed, with t
 For the flow of the solution, an image text segmentation network will first be computed with the input image.
 The output of the segmentation will then be a mask of the target text region which can then be used as one of the input of the 
 inpainting model to remove the text region from the image, resulting in the final output image with the text removed. The 
-project repository can be accessed with cloning the following 
-\href{https://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@github.com/GLGDLY/ELEC4240_project}{Github link} 
-with the provided read-only fine-grained access token, with the corresponding branches for the 2 parts of the project.
+project repository can be accessed with cloning the following \href{https://github.com/GLGDLY/ELEC4240_project}{Github link}, 
+with the corresponding branches for the 2 parts of the project.
 
 \section{Problem statement}
 
@@ -104,8 +103,8 @@ A total of 12,263 images were selected, with 8,034 and 4,229 images in the train
 We will be working on another dataset shortly given the small dataset size RCTW are providing currently. The current dataset can be accessed with the following 
 \href{https://drive.google.com/drive/folders/1BbLe23KN1At6xsItvBcj9dXhPv6LdQH_?usp=sharing}{Google Drive link}.
 
-Making use with the above dataset, dynamic mask generation will be involved during the dataset loading process. 
-Pre-processed annotations given in the to generate binary masks, saving them as single-channel image files that are loaded alongside their corresponding input images during training. 
+Making use with the above dataset, the bounding box annotations of the text regions provided were being processed and converted into binary mask images.
+These image files are thus loaded as single-channel masks alongside their corresponding input images during the training process. 
 It aims to provide accurate text region annotations, with their relative efficiency and impact on model performance to be analyzed in subsequent sections of this report. 
 These binary masks serve dual purposes: they act as ground truth labels for training the segmentation model, and later provide a standardized format for the inpainting stage of the text removal pipeline.
 
