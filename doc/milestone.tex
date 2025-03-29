@@ -6,7 +6,7 @@
 
 %%%%%%%%% PAPER TYPE  - PLEASE UPDATE FOR FINAL VERSION
 % \usepackage[review]{cvpr}      % To produce the REVIEW version
-\usepackage[final]{cvpr}              % To produce the CAMERA-READY version
+\usepackage{cvpr}              % To produce the CAMERA-READY version
 %\usepackage[pagenumbers]{cvpr} % To force page numbers, e.g. for an arXiv version
 
 % Include other packages here, before hyperref.
@@ -89,9 +89,9 @@ To approach the problem, a mixed deep learning solution will be proposed, with t
 For the flow of the solution, an image text segmentation network will first be computed with the input image.
 The output of the segmentation will then be a mask of the target text region which can then be used as one of the input of the 
 inpainting model to remove the text region from the image, resulting in the final output image with the text removed. The 
-project repository can be found with cloning this 
+project repository can be accessed with cloning the following 
 \href{https://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@github.com/GLGDLY/ELEC4240_project}{Github link} 
-with the provided read-only fine-grained access token.
+with the provided read-only fine-grained access token, with the corresponding branches for the 2 parts of the project.
 
 \section{Problem statement}
 
@@ -152,6 +152,7 @@ changing $LAMBDA$ value during the training process.
 \section{Technical Approach}
 
 \subsection{Image text segmentation}
+
 In accordance with the aforementioned problem statement, an improved architecture was proposed and designed on the basis of the U-Net model. 
 The original U-Net architecture is of encoder-decoder form with the encoder slowly reducing the spatial dimensions of the input image with 
 deeper feature representation being learned and the decoder generating the segmentation map by upsampling the said features. 
@@ -212,27 +213,11 @@ Initial tests were conducted to evaluate the performance of different architectu
 hyperparameters and training epochs across experiments. The primary focus at this stage is on the Dice Loss and IoU metrics, as these 
 directly reflect the model's ability to accurately identify text regions. 
 
-Firstly, the enhanced architecture is illustrated in \cref{fig:model1}. The baseline U-Net occasionally produces fragmented text regions and 
-struggles with text at varying scales, particularly with Chinese characters with different text scales and styles. The model learns to distinguish text 
-from background, where the skip connections help maintain precise text boundaries. This model provided the crucial first step of identifying text regions 
-that need to be inpainted by outputting the binary masks. 
-
-\begin{figure}[t]
-    \centering
-    \includegraphics[width=\linewidth]{figures/milestone/model.png}
-    \caption{Output architectural image of the model.}
-    \label{fig:model1}
-\end{figure}
-
-Secondly, the evaluation metrics from the training process demonstrate progress in the model's ability to segment text regions. 
-After conducting data processing to generate image mask layers for the RCTW-dataset (as shown in \cref{fig:verify}), we moved on and trained the model. 
-As shown in \cref{fig:out_iou} and \cref{fig:out_loss}, the IoU metric generally increases over 4,000 iterations, with a notable peak at around 2,500 iterations, 
-while the loss function correspondingly decreases. Since the IoU metric directly measures the overlap between predicted and actual text regions, 
-a higher IoU indicates more precise text localization, which is critical for subsequent inpainting tasks. The temporary performance regression observed 
-between iterations 2,500 and 3,000 may suggest the model encountering challenging examples or potentially overfitting to certain text patterns. 
-Despite the fluctuation, the overall positive trajectory of IoU and the decreasing loss function indicate that the model is effectively learning to 
-distinguish text regions across our diverse bilingual dataset. In subsequent stages, we will focus on evaluating the model's quality of the inpainting 
-process when applied to the generated masks, particularly in preserving the visual consistency of complex backgrounds after text removal.
+Firstly, the baseline U-Net occasionally produces fragmented text regions and struggles with text at varying scales, particularly with Chinese characters 
+with different text scales and styles. This model therefore aims to learn distinguish text from background, where the skip connections with attention gates 
+and residual blocks might help improve gradient flow and maintain precise text boundaries. Currently, the implemented model provided the crucial first step 
+of identifying text regions that need to be inpainted by outputting the binary masks, with conducting data processing to generate image mask layers for the 
+RCTW-dataset (as shown in \cref{fig:verify}).
 
 \begin{figure}[t]
     \centering
@@ -240,6 +225,27 @@ process when applied to the generated masks, particularly in preserving the visu
     \caption{Example of mask image generated with the RCTW-dataset.}
     \label{fig:verify}
 \end{figure}
+
+% Firstly, the enhanced architecture is illustrated in \cref{fig:model1}. The baseline U-Net occasionally produces fragmented text regions and 
+% struggles with text at varying scales, particularly with Chinese characters with different text scales and styles. The model learns to distinguish text 
+% from background, where the skip connections help maintain precise text boundaries. This model provided the crucial first step of identifying text regions 
+% that need to be inpainted by outputting the binary masks. 
+
+% \begin{figure}[t]
+%     \centering
+%     \includegraphics[scale=0.01]{figures/milestone/model.png}
+%     \caption{Output architectural image of the model.}
+%     \label{fig:model1}
+% \end{figure}
+
+Secondly, the evaluation metrics from the training process demonstrate progress in the model's ability to segment text regions. 
+As shown in \cref{fig:out_iou} and \cref{fig:out_loss}, the IoU metric generally increases over 4,000 iterations, while the loss function correspondingly decreases. 
+Since the IoU metric directly measures the overlap between predicted and actual text regions, a higher IoU indicates more precise text localization, 
+which is critical for subsequent inpainting tasks. The loss function, on the other hand, reflects the model's learning process, with a decreasing trend indicating improved performance.
+The current results, with overall a positive trajectory of IoU and decreasing trend on the loss, show the model's ability to effectively learn and adapt to the dataset, distinguishing 
+text regions across our diverse bilingual dataset, yet the model is still in the early stages of convergence. In subsequent stages, we will focus on evaluating and improving the model's 
+performance through different hyperparameters and architectural modifications, including the introduction of attention mechanisms and  modifications to the encoder pathway, as 
+mentioned in the previous sections.
 
 \begin{figure}[t]
     \centering
