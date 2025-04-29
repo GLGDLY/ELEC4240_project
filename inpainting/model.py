@@ -226,19 +226,22 @@ def Discriminator() -> tf.keras.Model:
     down1 = downsample(3, 64, 4, False)(x)  # (batch_size, 128, 128, 64)
     down2 = downsample(64, 128, 4)(down1)  # (batch_size, 64, 64, 128)
     down3 = downsample(128, 256, 4)(down2)  # (batch_size, 32, 32, 256)
+    down4 = downsample(256, 512, 4)(down3)  # (batch_size, 16, 16, 512)
 
-    zero_pad1 = tf.keras.layers.ZeroPadding2D()(down3)  # (batch_size, 34, 34, 256)
+    zero_pad1 = tf.keras.layers.ZeroPadding2D()(down4)  # (batch_size, 34, 34, 512)
     conv = tf.keras.layers.Conv2D(
-        512, 4, strides=1, kernel_initializer=initializer, use_bias=False
+        512 * 2, 4, strides=1, kernel_initializer=initializer, use_bias=False
     )(
         zero_pad1
-    )  # (batch_size, 31, 31, 512)
+    )  # (batch_size, 31, 31, 512 * 2)
 
     batchnorm1 = tf.keras.layers.BatchNormalization()(conv)
 
     leaky_relu = tf.keras.layers.LeakyReLU()(batchnorm1)
 
-    zero_pad2 = tf.keras.layers.ZeroPadding2D()(leaky_relu)  # (batch_size, 33, 33, 512)
+    zero_pad2 = tf.keras.layers.ZeroPadding2D()(
+        leaky_relu
+    )  # (batch_size, 33, 33, 512 * 2)
 
     last = tf.keras.layers.Conv2D(1, 4, strides=1, kernel_initializer=initializer)(
         zero_pad2
@@ -247,7 +250,7 @@ def Discriminator() -> tf.keras.Model:
     return tf.keras.Model(inputs=[inp, tar], outputs=last)
 
 
-LAMBDA = 100  # 100
+LAMBDA = 50  # 100
 criteriation = tf.keras.losses.BinaryCrossentropy(from_logits=True)
 
 

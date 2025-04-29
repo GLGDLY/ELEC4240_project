@@ -4,7 +4,7 @@ os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"
 
 import pathlib
 from datetime import datetime
-from typing import List
+from typing import List, Literal
 
 import numpy as np
 import tensorflow as tf
@@ -30,6 +30,7 @@ class Trainer:
         generator_type: GeneratorType,
         model_suffix: str = "",
         output_dir: str = "./models",
+        save_best_method: Literal["l1", "gan", "total"] = "total",
     ):
         self.generator = Generator(generator_type=generator_type)
         self.discriminator = Discriminator()
@@ -37,6 +38,8 @@ class Trainer:
         self.model_suffix = (
             model_suffix + "_" + datetime.now().strftime("%Y%m%d-%H%M%S")
         )
+
+        self.save_best_method = save_best_method
         self.output_dir = output_dir
         self.best_generator_path = (
             self.output_dir + f"/best_generator_{self.model_suffix}.h5"
@@ -127,7 +130,7 @@ class Trainer:
     def __fit(self, epoch, train_ds, val_ds):
         # train
         print("Training...")
-        best_gen_total_loss = float("inf")
+        best_loss = float("inf")
 
         # train
         t_gen_total_loss, t_gen_gan_loss, t_gen_l1_loss, t_disc_loss = 0, 0, 0, 0
@@ -167,8 +170,14 @@ class Trainer:
         gen_l1_loss /= len(test_ds)
         disc_loss /= len(test_ds)
 
-        if gen_total_loss < best_gen_total_loss:
-            best_gen_total_loss = gen_total_loss
+        if self.save_best_method == "l1":
+            this_loss = gen_l1_loss
+        elif self.save_best_method == "gan":
+            this_loss = gen_gan_loss
+        elif self.save_best_method == "total":
+            this_loss = gen_total_loss
+        if this_loss < best_loss:
+            best_loss = this_loss
             self.generator.save(self.best_generator_path)
             self.discriminator.save(self.best_discriminator_path)
         self.generator.save(self.last_generator_path)
@@ -247,5 +256,9 @@ if __name__ == "__main__":
         training=False
     )
 
-    trainer = Trainer(GeneratorType.MIXED_CONV, model_suffix="mix_conv_fixmask")
-    trainer.train(kfold_ds, test_ds, epochs=50)
+    trainer = Trainer(
+        GeneratorType.PARTIAL_CONV,
+        model_suffix="p_conv_fixmask_50lambda_more_disc_layer_300epochs",
+        save_best_method="total",
+    )
+    trainer.train(kfold_ds, test_ds, epochs=300)
