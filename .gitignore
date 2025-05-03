@@ -15,6 +15,8 @@ __pycache__/
 *.out
 *.pdf
 
+test.jpg
+
 # inpainting
 inpainting/data/*
 !inpainting/data/data_process.py
@@ -23,3 +25,6 @@ inpainting/logs/
 inpainting/models/
 inpainting/*.jpg
 inpainting/*.png
+
+# segmentation
+segmentation/checkpoints/

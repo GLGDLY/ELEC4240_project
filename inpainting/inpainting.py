@@ -121,7 +121,7 @@ if __name__ == "__main__":
     mask = _load_mask("mask_chi_eng.jpg")
     mask = mask[None, :, :, :]
 
-    in_image = in_image * mask + (1 - mask)
+    # in_image = in_image * mask + (1 - mask)
 
     print("in_shape:", in_image.shape)
     print("mask_shape:", mask.shape)
