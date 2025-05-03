@@ -83,10 +83,10 @@ if __name__ == "__main__":
     # find the latest model of {model_suffix}
     # model_suffix = "stand_conv_fixmask"
     # gen_type = GeneratorType.STANDARD_CONV
-    # model_suffix = "p_conv_fixmask_bugfix"
-    # gen_type = GeneratorType.PARTIAL_CONV
-    model_suffix = "mix_conv_fixmask"
-    gen_type = GeneratorType.MIXED_CONV
+    model_suffix = "p_conv_fixmask_50lambda_more_disc_layer_300epochs"
+    gen_type = GeneratorType.PARTIAL_CONV
+    # model_suffix = "mix_conv_fixmask"
+    # gen_type = GeneratorType.MIXED_CONV
 
     model_dir = "./models"
     models = list(
@@ -106,7 +106,8 @@ if __name__ == "__main__":
     else:
         inpainting = Inpainting(None, gen_type)
 
-    with open("./data/dataset/test/COCO_train2014_000000000030.jpg", "rb") as f:
+    # with open("./data/dataset/test/COCO_train2014_000000000030.jpg", "rb") as f:
+    with open("./chi_eng.png", "rb") as f:
         in_image = tf.image.decode_jpeg(f.read(), channels=3)
     ori_height, ori_width = in_image.shape[0], in_image.shape[1]
 
@@ -114,9 +115,10 @@ if __name__ == "__main__":
     in_image = normalize_img_tensor(in_image)  # map in_image to [-1, 1]
     in_image = in_image[None, :, :, :]
 
-    mask = _gen_mask(in_image)
+    # mask = _gen_mask(in_image)
     # mask = _load_mask("./data/dataset/test/mask/COCO_train2014_000000000030.jpg")
     # mask = _load_mask("mask.jpg")
+    mask = _load_mask("mask_chi_eng.jpg")
     mask = mask[None, :, :, :]
 
     in_image = in_image * mask + (1 - mask)
@@ -138,4 +140,4 @@ if __name__ == "__main__":
     display_result(in_image, mask, out_tensor)
 
     # save mask
-    # plt.imsave("mask.jpg", tf.squeeze(1.0 - mask).numpy(), cmap="gray")
+    # plt.imsave("mask_chi_eng.jpg", tf.squeeze(1.0 - mask).numpy(), cmap="gray")

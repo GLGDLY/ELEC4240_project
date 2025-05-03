@@ -105,6 +105,7 @@ class InpaintingDataGenerator:
         image = self._load_and_preprocess(image_path)
         image = self._random_augmentation(image)
         mask = self._load_mask(image_path)
+        # mask = self._generate_random_mask(image)
         masked_image = self._apply_mask(image, mask)
         return (masked_image, mask), image
 
