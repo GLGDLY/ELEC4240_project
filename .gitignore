@@ -1,5 +1,10 @@
+#IDE
+.idea/
+.vscode/
+
 # python
 __pycache__/
+.pytest_cache/
 
 # latex
 *.aux
@@ -9,3 +14,12 @@ __pycache__/
 *.brf
 *.out
 *.pdf
+
+# inpainting
+inpainting/data/*
+!inpainting/data/data_process.py
+inpainting/venv/
+inpainting/logs/
+inpainting/models/
+inpainting/*.jpg
+inpainting/*.png

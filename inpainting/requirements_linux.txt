@@ -1,0 +1,5 @@
+tensorflow[and-cuda]
+matplotlib
+numpy==1.26.4
+tqdm
+scikit-learn
