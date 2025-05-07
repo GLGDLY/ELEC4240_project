@@ -28,3 +28,4 @@ inpainting/*.png
 
 # segmentation
 segmentation/checkpoints/
+segmentation/processed_data/
