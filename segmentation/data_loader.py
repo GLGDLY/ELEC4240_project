@@ -32,13 +32,8 @@ class SegmentationDataGenerator:
         return image
 
     def _load_segmentation_mask(self, image_path):
-        parts = tf.strings.split(image_path, "/")
-        if len(parts) == 1:
-            parts = tf.strings.split(image_path, "\\")
-        file = parts[-1]
-        folder = tf.strings.reduce_join(parts[:-2], separator="/")
-
-        mask_path = tf.strings.join([folder, "mask", file], separator="/")
+        mask_path = tf.strings.regex_replace(image_path, r"[\\/]images[\\/]", "/masks/")
+        mask_path = tf.strings.regex_replace(mask_path, ".jpg", "_mask.jpg")
 
         mask = tf.io.read_file(mask_path)
         mask = tf.image.decode_jpeg(mask, channels=1)
@@ -79,12 +74,12 @@ class SegmentationDataGenerator:
         #     image, mask, augmented_image
         # )
 
-        return (augmented_image, mask), image
+        return augmented_image, mask
 
     def _val_process_path(self, image_path):
         image = self._load_and_preprocess(image_path)
         mask = self._load_segmentation_mask(image_path)
-        return (image, mask), image
+        return image, mask
 
     def get_dataset(self, training=True):
         dataset = tf.data.Dataset.from_tensor_slices(self.image_paths)

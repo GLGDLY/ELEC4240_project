@@ -1,40 +1,55 @@
 import tensorflow as tf
 from tensorflow.keras import layers, Model
 
+
 class UNet(Model):
     def __init__(self, input_size=(256, 256, 3)):
         super(UNet, self).__init__()
-        
+
         # Encoder
-        def encoder_block(x, filters, kernel_size=3, padding='same', strides=1):
-            x = layers.Conv2D(filters, kernel_size, padding=padding, strides=strides, 
-                            kernel_initializer='he_normal')(x)
+        def encoder_block(x, filters, kernel_size=3, padding="same", strides=1):
+            x = layers.Conv2D(
+                filters,
+                kernel_size,
+                padding=padding,
+                strides=strides,
+                kernel_initializer="he_normal",
+            )(x)
             x = layers.BatchNormalization()(x)
             x = layers.ReLU()(x)
-            
-            x = layers.Conv2D(filters, kernel_size, padding=padding, strides=1,
-                            kernel_initializer='he_normal')(x)
+
+            x = layers.Conv2D(
+                filters,
+                kernel_size,
+                padding=padding,
+                strides=1,
+                kernel_initializer="he_normal",
+            )(x)
             x = layers.BatchNormalization()(x)
             x = layers.ReLU()(x)
-            
+
             return x
 
         # Decoder
-        def decoder_block(x, skip_features, filters, kernel_size=3, padding='same', strides=1):
-            x = layers.Conv2DTranspose(filters, (2, 2), strides=2, padding='same')(x)
-            
+        def decoder_block(
+            x, skip_features, filters, kernel_size=3, padding="same", strides=1
+        ):
+            x = layers.Conv2DTranspose(filters, (2, 2), strides=2, padding="same")(x)
+
             x = layers.Concatenate()([x, skip_features])
-            
-            x = layers.Conv2D(filters, kernel_size, padding=padding,
-                            kernel_initializer='he_normal')(x)
+
+            x = layers.Conv2D(
+                filters, kernel_size, padding=padding, kernel_initializer="he_normal"
+            )(x)
             x = layers.BatchNormalization()(x)
             x = layers.ReLU()(x)
-            
-            x = layers.Conv2D(filters, kernel_size, padding=padding,
-                            kernel_initializer='he_normal')(x)
+
+            x = layers.Conv2D(
+                filters, kernel_size, padding=padding, kernel_initializer="he_normal"
+            )(x)
             x = layers.BatchNormalization()(x)
             x = layers.ReLU()(x)
-            
+
             return x
 
         inputs = layers.Input(input_size)
@@ -63,9 +78,14 @@ class UNet(Model):
 
         d4 = decoder_block(d3, e1, 64)
 
-        outputs = layers.Conv2D(1, 1, padding='same', activation='sigmoid')(d4)
+        outputs = layers.Conv2D(1, 1, padding="same", activation="sigmoid")(d4)
 
         self.model = Model(inputs, outputs, name="U-Net")
 
     def call(self, inputs):
         return self.model(inputs)
+
+
+if __name__ == "__main__":
+    model = UNet()
+    tf.keras.utils.plot_model(model.model, show_shapes=True)
