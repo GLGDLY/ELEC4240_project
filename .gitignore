@@ -30,3 +30,5 @@ inpainting/*.png
 segmentation/checkpoints/
 segmentation/processed_data/
 segmentation/logs/
+segmentation/*.h5
+segmentation/*.png
