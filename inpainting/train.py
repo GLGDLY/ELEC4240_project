@@ -85,6 +85,12 @@ class Trainer:
         with tf.GradientTape() as gen_tape, tf.GradientTape() as disc_tape:
             gen_output = self.generator([masked_image, in_mask], training=True)
 
+            noise_level = 0.05 * tf.random.uniform([])
+            masked_image = (
+                masked_image + tf.random.normal(tf.shape(masked_image)) * noise_level
+            )
+            target = target + tf.random.normal(tf.shape(target)) * noise_level
+
             disc_real_output = self.discriminator([masked_image, target], training=True)
             disc_generated_output = self.discriminator(
                 [masked_image, gen_output], training=True
@@ -204,11 +210,11 @@ class Trainer:
 
     def train(
         self,
-        kfold_ds: List[tf.data.Dataset],
+        kfold_ds: tf.data.Dataset,
         test_ds: tf.data.Dataset,
         epochs: int,
     ):
-        train_ds, val_ds = kfold_ds[0]  # TODO: implement kfold
+        train_ds, val_ds = kfold_ds
         for epoch in range(epochs):
             print(f"Epoch {epoch + 1}/{epochs}")
             self.__fit(epoch, train_ds, val_ds)
@@ -247,18 +253,21 @@ if __name__ == "__main__":
     train_val_dir = ds_dir + "/train"
     test_dir = ds_dir + "/test"
 
-    kfold_ds = prepare_kfold_data(train_val_dir, batch_size=32)
+    batch_size = 64
+    kfold_ds = prepare_kfold_data(train_val_dir, batch_size=batch_size)
 
     test_data_root = pathlib.Path(test_dir)
     test_image_paths = [str(p) for p in test_data_root.glob("*.jpg")]
     test_image_paths = np.array(test_image_paths)
-    test_ds = InpaintingDataGenerator(test_image_paths, batch_size=32).get_dataset(
-        training=False
-    )
+    test_ds = InpaintingDataGenerator(
+        test_image_paths, batch_size=batch_size
+    ).get_dataset(training=False)
 
-    trainer = Trainer(
-        GeneratorType.PARTIAL_CONV,
-        model_suffix="p_conv_fixmask_50lambda_more_disc_layer_300epochs",
-        save_best_method="total",
-    )
-    trainer.train(kfold_ds, test_ds, epochs=300)
+    for i, fold_ds in enumerate(kfold_ds):
+        print(f"Fold {i + 1}/{len(kfold_ds)}")
+        trainer = Trainer(
+            GeneratorType.PARTIAL_CONV,
+            model_suffix=f"p_conv_fixmask_50lambda_with_smooth_0.05noise_500epochs_fold{i+1}",
+            save_best_method="total",
+        )
+        trainer.train(fold_ds, test_ds, epochs=500)
