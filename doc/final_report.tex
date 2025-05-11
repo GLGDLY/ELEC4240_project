@@ -374,7 +374,7 @@ experiments would be needed to fine-tune the whole GAN model for an optimal perf
 \begin{figure}[t]
     \centering
     \includegraphics[width=\linewidth]{figures/milestone/smooth_with_noise.png}
-    \caption{Comparison of the training $gen\_l1\_loss$, with purple line as the label smoothing approach, and green line as the dynamic noise injection approach.}
+    \caption{Comparison of the training $gen\_l1\_loss$, with pink line is the original discriminator loss on 50 epochs, and green link is the discrimination loss with label smoothing and noise injection on 500 epochs.}
     \label{fig:smooth_with_noise}
 \end{figure}
 
@@ -384,7 +384,6 @@ This project has developed a mixed model pipeline to perform the task of text re
 the model is able to generate a mask of the text region and then inpaint the text region with the surrounding information. An example can be shown in \cref{fig:final_result},
 showing a successful removal of the text region from the input image.
 
-%%%% TODO: add the final result image
 \begin{figure}[t]
     \centering
     \includegraphics[width=\linewidth]{figures/milestone/final_result.jpg}
