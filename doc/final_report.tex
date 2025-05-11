@@ -137,10 +137,10 @@ The above works have inspired the design of our inpainting model, where we aim t
 \section{Problem statement}
 
 \subsection{Image text segmentation}
-To commence with, the first problem of this project is to develop an image text segmentation model capable of detecting and segmenting text regions from images. 
-The model is required to generate a binary mask for the inpainting process to work with, where text regions are marked as 1 and non-text regions are marked as 0 in the mask output.
+To commence with, the first problem of this project is to create an image text segmentation model which can detect and segment text areas from images.
+The model should generate a binary mask for the inpainting such that it will work, defining text regions as 1 and non-text regions as 0 in the resulting mask.
 
-To achieve this, the RCTW-17 dataset was utilized, offering pre-labeled images with multilingual text in various styles and complex backgrounds. 
+The above was implemented using the RCTW-17 dataset with pre-labeled images containing multilingual text in various styles with complex backgrounds.
 A total of 12,263 images were selected, with 8,034 images allocated for training and 4,229 for testing respectively. The current dataset can be accessed with the following 
 \href{https://drive.google.com/drive/folders/1BbLe23KN1At6xsItvBcj9dXhPv6LdQH_?usp=sharing}{Google Drive link}.
 
@@ -194,27 +194,26 @@ changing $LAMBDA$ value during the training process.
 
 \subsection{Image text segmentation}
 
-In accordance with the aforementioned problem statement, a modified segmentation architecture was developed, building upon the foundational U-Net model. 
-The original U-Net architecture is of encoder-decoder form with the encoder slowly reducing the spatial dimensions of the input image with 
-deeper feature representation being learned, and the decoder generating the segmentation map by upsampling the said features. 
+According to the given problem statement, a modified segmentation architecture was developed based on the basic U-Net model.
+The original U-Net architecture is of encoder-decoder form with  in nature with the encoder progressively reducing the spatial resolution of the 
+input image with deeper feature representation being learned, and the decoder generating the segmentation map by upsampling the above features.
 In addition with the skip connections, which is to preserve spatial information across different scales, can make the model to be suitable
-for precise segmentation tasks. Nevertheless, given that U-Net was originally designed for biomedical image segmentation, 
-some modifications are needed in order to fit the challenging nature of mixed-language text segmentation, where textual characteristics can vary 
-dynamically in terms of font, scale, and orientation. 
+for precise segmentation tasks. However, as U-Net initially was designed for biomedical image segmentation, some adjustments are needed such that 
+it is appropriate for the challenging task of mixed-language text segmentation where textual features change dynamically in font, scale, and orientation. 
 
-To enhance its performance even more, several key modifications have been incorporated. Firstly, the encoder pathway was enhanced through replacing 
-the vanilla convolutional blocks with ResNet blocks. With this modification, the model now has the capability of learning abstract-level features 
-by exploiting skip connections of the ResNet block architecture for alleviating the vanishing gradient issue and deep feature extraction. 
-Secondly, an attention mechanism will be introduced in skip connections across decoder and encoder paths. Unlike the original direct skip connections, 
+To further enhance its performance, certain significant modifications have been made. Firstly, the encoder pathway has been enhanced by replacing 
+the vanilla convolutional blocks with ResNet blocks. With this modification, the model is now capable of learning abstract-level features 
+using skip connections of the ResNet block architecture to alleviate the vanishing gradient issue and deep feature extraction. 
+Secondly, an attention mechanism will be incorporated in skip connections across decoder and encoder paths. Unlike the original direct skip connections, 
 the attention gates allow the model to focus on meaningful areas of text while suppressing background noise, 
 achieved as: $F_{att} = \sigma(W_x * x + W_g * g + b)$, where $x$ denotes encoder features, $g$ is the gated signal from the decoder, 
 and $\sigma$ is the sigmoid activation function. 
-Lastly, the decoder path will be reinforced further with additional convolutional layers to better restore fine text detail. 
-This decoder depth augmentation is aimed to improve the restoration of intricate text contours, and thus increase the segmentation accuracy.
+Lastly, the decoder path is reinforced further by additional convolutional layers to better restore finer text details.
+This decoder depth augmentation is done for the purpose of improving the recovery of intricate text contours, and thus segmentation accuracy.
 
-With these architectural changes, the model shows improved text segmentation capability. However, there still exists a problem 
-in processing text with extreme size or extreme deformation. To address this, we are using a multi-scale training strategy, where input images at varying resolutions 
-are fed to the model during training for encouraging the learning of scale-invariant features. In addition, to further enhance the capability of the model 
+Through these design changes, the model exhibits improved text segmentation performance. However, there still remains a problem 
+in processing text with extreme size or extreme distortion. To address this, we are embracing a multi-scale training strategy, where input images of varying resolutions 
+are fed to the model during training to encourage scale-invariant feature learning. In addition, to further enhance the capability of the model 
 to distinguish text from text-like patterns in complex backgrounds, a dual-attention mechanism is suggested for both spatial and channel-wise operations. 
 The purpose of the spatial attention is to locate the text areas, and channel attention is applied to the feature channels best fit for the nature of the text. 
 These mechanisms are computed as: $A_s = \sigma(Conv(Concat[AvgPool(F); MaxPool(F)]))$ for spatial attention, and $A_c = \sigma(MLP(AvgPool(F)))$ 
@@ -258,14 +257,14 @@ improve the performance.
 \subsection{Image text segmentation}
 Initial experiments were conducted to evaluate the performance of different architectural approaches in the segmentation model, while maintaining consistent 
 hyperparameters, batch sizes, learning rates, and training epochs across all test scenarios. The evaluation was primarily based on the Dice Loss and 
-IoU metrics, as these are critical indicators of segmentation accuracy, particularly in delineating text from background.
+IoU metrics, as these are critical indicators of segmentation accuracy, particularly in recognizing text from background.
 
 Firstly, the baseline U-Net demonstrated several limitations. For example, it occasionally produces fragmented text regions and struggles with text at varying scales, 
 particularly with Chinese characters with different text scales and styles. This is brought by the lack of advanced feature discrimination capabilities of the original 
-U-Net and its reduced effectiveness in capturing long-range dependencies or fine-scale variance across spatial dimensions. Therefore, this model aims to learn 
-distinguishing text from background, where the skip connections with attention gates and residual blocks might help improve gradient flow and maintain precise text boundaries. 
-Currently, the implemented model represents a foundational component in the full text removal pipeline. It successfully produces binary masks that identify targeted text regions 
-for subsequent inpainting. These masks are derived by preprocessing the bounding box annotations in the RCTW-17 dataset to generate corresponding single-channel segmentation maps 
+U-Net and its weakened ability to capture long-range dependencies or fine-scale variance along spatial dimensions. Consequently, this model aims to learn 
+discrimination between text and background, where the skip connections with attention gates and residual blocks can improve gradient flow and preserve correct text edges. 
+Currently, the implemented model serves as a foundational building block across the entire pipeline of text removal. It can produce binary masks that identify target text regions 
+to be subsequently inpainted. These masks are derived by pre-processing the bounding box annotations in the RCTW-17 dataset to generate corresponding single-channel segmentation maps 
 (as shown in \cref{fig:verify}).
 
 \begin{figure}[t]
@@ -275,18 +274,18 @@ for subsequent inpainting. These masks are derived by preprocessing the bounding
     \label{fig:verify}
 \end{figure}
 
-Secondly, the evaluation metrics from the training process indicate progressive improvement in the model's capability to segment text regions accurately. 
-As illustrated  in \cref{fig:out_iou} and \cref{fig:out_loss}, the IoU metric exhibits a steady upward trend over 4,000 iterations, while the loss function correspondingly decreases. 
-The IoU metric, which directly measures the overlap between predicted segmentation masks and the ground truth, serves as a direct indicator of localization accuracy. A higher IoU value 
+Secondly, the evaluation metrics from the training process indicate a progressive improvement in the model's capability to segment text regions accurately. 
+As illustrated in \cref{fig:out_iou} and \cref{fig:out_loss}, the IoU metric improves steadily over 4,000 iterations, with the loss function decreasing correspondingly.
+The IoU score, measuring the overlap directly between predicted segmentation masks and the ground truth, is a direct localization accuracy measure. A higher IoU value 
 thus indicates more precise text localization, which is critical for subsequent inpainting tasks. The loss function, on the other hand, reflects the model's learning process, 
 with a decreasing trend indicating improved performance.
-The current results, with overall a positive trajectory of IoU and decreasing trend on the loss, show the model's ability to effectively learn and adapt to the dataset, distinguishing 
+The current results, with overall a positive trajectory of IoU and declining trend on the loss, show the model's ability to effectively learn and adapt to the dataset, distinguishing 
 text regions across our diverse bilingual dataset, yet the model is still in the early stages of convergence. Additional fine-tuning is expected to yield further gains.
 
 To enhance performance, future experimental work is expected to explore a broader set of attention mechanisms beyond the current spatial and channel-based modules. 
-These may include self-attention layers inspired by Transformer architectures, which are capable of modeling long-range dependencies across spatial dimensions and context-aware attention blocks, 
-which adaptively modulate features based on surrounding textual and non-textual regions. In addition, hyperparameter optimization will also be pursued systematically, 
-involving experiments with alternative optimizers (e.g., AdamW, Ranger), adaptive learning rate schedulers, and regularization methods such as label smoothing and dropout tuning. 
+These can include self-attention layers inspired by Transformer architectures, which can represent long-range spatial dependencies and context-aware attention blocks, which can 
+modulate features adaptively according to surrounding contextual and non-contextual regions. In addition, hyperparameter optimization shall also be investigated systematically, 
+such as experimenting with other optimizers (e.g., AdamW, Ranger), adaptive learning rate schedulers, and regularization methods such as label smoothing and dropout tuning. 
 These enhancements aim to achieve better convergence stability and generalization across unseen data.
 
 \begin{figure}[t]
