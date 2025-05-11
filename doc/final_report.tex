@@ -244,8 +244,11 @@ different generator architectures will be evaluated in the later section of this
 might destroy the feature maps of each other, leading to a worse performance on places like the edge of the image than the pure partial convolution approach.
 
 The discriminator is the PatchGAN model from the pix2pix architecture with Binary Cross Entropy loss. While a factor of $LAMBDA$ is used to balance the generator loss and the discriminator loss as in 
-\cref{eq:inpainting_loss}, various values of this $LAMBDA$ value would be tested to find the optimal value for our use case. The depth of the discriminator was also considered and modified to try 
-improve the performance.  
+\cref{eq:inpainting_loss}, various values of this $LAMBDA$ value would be tested to find the optimal value for our use case. Various techniques were also used to improve the performance and reduce the 
+overfitting of the discriminator, including label smoothing \cite{Muller2019} and dynamic noise injection \cite{Feng2021} to the discriminator training.
+
+With the above architecture, a K-Fold cross-validation approach was also used to evaluate the performance of the model, with 5 folds being used for the training and testing of the model, measure and 
+obtain the best performance model with the use of TensorBoard. Adam optimizer with learning rate schedular was also used, with the learning rate of generator as $2e-4$ and that of discriminator as $5e-5$.
 
 \begin{equation}
     L_{total} = L_{gen\_gan} + LAMBDA \times L_{gen\_l1}
@@ -361,7 +364,19 @@ would be selected for the further development of the model.
 \end{figure}
 
 However, from the above experiments, it can be seen that the discriminator is clearly overfitting during the training process, which might over-penalize the generator and lead to a worse performance of the 
-generator. As a result, 
+generator. As a result, various techniques like label smoothing and dynamic noise injection as mentioned above were used to improve the performamce and try reduce the overfitting of the discriminator. 
+Label smoothing was first implemented by patching the labels of the real image from 1 to 0.9 in the discriminator loss calculation. The noise injection approach was then implemented in the training process of the 
+whole GAN model, where a random noise with $5-10\%$ probability was added to the generated image and the real image before feeding to the discriminator. It was expected that these 2 approaches can help reduce the 
+confidence of the discriminator and thus reduce the overfitting issue. However, as shown in \cref{fig:smooth_with_noise}, although these approach can help defer the overfitting of the discriminator, it is still 
+clear that the discriminator continues to overfit after certian epochs. This shows that the current approaches are effective, yet not enough to fully solve the overfitting issue. Thus, further investigation and 
+experiments would be needed to fine-tune the whole GAN modle for a optimal performance on the current architecture.
+
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=\linewidth]{figures/milestone/smooth_with_noise.png}
+    \caption{Comparison of the training $gen\_l1\_loss$, with purple line as the label smoothing approach, and green line as the dynamic noise injection approach.}
+    \label{fig:smooth_with_noise}
+\end{figure}
 
 \section{Conclusion}
 
